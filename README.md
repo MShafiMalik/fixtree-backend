@@ -29,6 +29,7 @@ A scalable, production-ready NestJS backend for the Fixtree physical service mar
 ### Key Features
 
 - Multi-role authentication (Buyer, Seller, Admin, Super Admin)
+- Google OAuth login (Web & Mobile)
 - Multi-platform support (Web, iOS, Android)
 - Session management with device tracking
 - Logout from all devices
@@ -56,6 +57,7 @@ A scalable, production-ready NestJS backend for the Fixtree physical service mar
 | **Cache/Queue** | Redis | ^7.x |
 | **Job Queue** | BullMQ | ^5.x |
 | **Authentication** | Passport + JWT | ^0.7.x |
+| **Google OAuth** | google-auth-library | ^9.x |
 | **Validation** | class-validator | ^0.14.x |
 | **File Upload** | Cloudinary | ^2.x |
 | **Email** | SendGrid | ^8.x |
@@ -202,7 +204,8 @@ fixtree-backend/
     │   ├── bullmq.config.ts            # Redis & BullMQ settings
     │   ├── cloudinary.config.ts        # Cloudinary credentials
     │   ├── sendgrid.config.ts          # SendGrid settings
-    │   └── twilio.config.ts            # Twilio SMS settings
+    │   ├── twilio.config.ts            # Twilio SMS settings
+    │   └── google.config.ts            # Google OAuth settings
     │
     ├── common/                         # Shared utilities
     │   ├── constants/
@@ -373,6 +376,7 @@ GET    /health                          # System health status
 ```
 POST   /auth/register                   # Register new user
 POST   /auth/login                      # Login, get tokens
+POST   /auth/google                     # Google OAuth login
 POST   /auth/refresh-token              # Refresh access token
 POST   /auth/logout                     # Logout current device
 POST   /auth/change-password            # Change password
@@ -508,6 +512,11 @@ TWILIO_ACCOUNT_SID=your-account-sid
 TWILIO_AUTH_TOKEN=your-auth-token
 TWILIO_PHONE_NUMBER=+1234567890
 TWILIO_VERIFY_SERVICE_SID=your-verify-service-sid
+
+# ============================================
+# GOOGLE OAUTH
+# ============================================
+GOOGLE_CLIENT_ID=your-google-client-id
 
 # ============================================
 # SUPER ADMIN (Seeder)

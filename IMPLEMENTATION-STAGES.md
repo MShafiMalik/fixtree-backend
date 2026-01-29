@@ -77,7 +77,8 @@ src/
     ├── bullmq.config.ts
     ├── cloudinary.config.ts
     ├── sendgrid.config.ts
-    └── twilio.config.ts
+    ├── twilio.config.ts
+    └── google.config.ts      # Google OAuth settings
 ```
 
 **Dependencies to install:**
@@ -393,6 +394,7 @@ npm run migration:run
 - [ ] Create JWT refresh strategy
 - [ ] Implement register endpoint
 - [ ] Implement login endpoint
+- [ ] Implement Google OAuth login endpoint
 - [ ] Implement refresh token endpoint
 - [ ] Implement logout endpoint
 - [ ] Create auth DTOs
@@ -415,8 +417,18 @@ src/modules/auth/
 
 **Dependencies to install:**
 ```bash
-npm install @nestjs/jwt @nestjs/passport passport passport-jwt
+npm install @nestjs/jwt @nestjs/passport passport passport-jwt google-auth-library
 npm install -D @types/passport-jwt
+```
+
+**Google OAuth Flow (Token Verification):**
+```
+1. Client gets Google ID Token from Google Sign-In SDK
+2. Client sends POST /api/auth/google { idToken, deviceInfo? }
+3. Backend verifies token with google-auth-library
+4. Backend extracts user info (email, googleId, name, picture)
+5. Backend finds or creates user
+6. Backend creates session and returns JWT tokens
 ```
 
 ---
