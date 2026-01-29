@@ -8,6 +8,7 @@ import bullmqConfig from './bullmq.config';
 import cloudinaryConfig from './cloudinary.config';
 import sendgridConfig from './sendgrid.config';
 import twilioConfig from './twilio.config';
+import googleConfig from './google.config';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import twilioConfig from './twilio.config';
         cloudinaryConfig,
         sendgridConfig,
         twilioConfig,
+        googleConfig,
       ],
       validationSchema: envValidationSchema,
       validationOptions: {

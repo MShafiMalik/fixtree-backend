@@ -44,6 +44,9 @@ export const envValidationSchema = Joi.object({
   CLOUDINARY_API_KEY: Joi.string().required(),
   CLOUDINARY_API_SECRET: Joi.string().required(),
 
+  // Google OAuth
+  GOOGLE_CLIENT_ID: Joi.string().required(),
+
   // Super Admin
   SUPER_ADMIN_EMAIL: Joi.string().email().required(),
   SUPER_ADMIN_PASSWORD: Joi.string().min(8).required(),
