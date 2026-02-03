@@ -13,6 +13,8 @@ import { User } from '../users/entities/user.entity';
 import { GoogleLoginDto } from './dto/google-login.dto';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
+import { SessionsService } from './sessions/sessions.service';
+import { DeviceInfoDto } from './dto/device-info.dto';
 
 @Injectable()
 export class AuthService {
@@ -23,6 +25,7 @@ export class AuthService {
     private readonly utilService: UtilService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
+    private readonly sessionsService: SessionsService,
   ) {
     const googleClientId = this.configService.get<string>('google.clientId');
     if (googleClientId) {
@@ -45,7 +48,14 @@ export class AuthService {
     };
   }
 
-  async login(loginDto: LoginDto) {
+  async login(
+    loginDto: LoginDto,
+    context?: {
+      deviceInfo?: DeviceInfoDto;
+      ipAddress?: string;
+      userAgent?: string;
+    },
+  ) {
     const user = await this.usersService.findByEmail(loginDto.email);
 
     if (!user?.password) {
@@ -67,13 +77,25 @@ export class AuthService {
       );
     }
 
-    const sessionId = this.utilService.generateRandomString(32);
-    const tokens = await this.signTokens(user, sessionId);
+    const session = await this.sessionsService.createSession(
+      user.id,
+      context?.deviceInfo,
+      context?.ipAddress,
+      context?.userAgent,
+    );
+    const tokens = await this.signTokens(user, session.id);
 
     return this.buildAuthResponse(user, tokens);
   }
 
-  async googleLogin(googleLoginDto: GoogleLoginDto) {
+  async googleLogin(
+    googleLoginDto: GoogleLoginDto,
+    context?: {
+      deviceInfo?: DeviceInfoDto;
+      ipAddress?: string;
+      userAgent?: string;
+    },
+  ) {
     const clientId = this.configService.get<string>('google.clientId');
     if (!clientId || !this.googleClient) {
       throw new UnauthorizedException('Google login is not configured');
@@ -96,8 +118,13 @@ export class AuthService {
       profileImage: payload.picture,
     });
 
-    const sessionId = this.utilService.generateRandomString(32);
-    const tokens = await this.signTokens(user, sessionId);
+    const session = await this.sessionsService.createSession(
+      user.id,
+      context?.deviceInfo,
+      context?.ipAddress,
+      context?.userAgent,
+    );
+    const tokens = await this.signTokens(user, session.id);
 
     return this.buildAuthResponse(user, tokens);
   }
@@ -115,6 +142,8 @@ export class AuthService {
       );
 
       const user = await this.usersService.findById(payload.sub);
+      await this.sessionsService.validateSession(payload.sessionId);
+      await this.sessionsService.touch(payload.sessionId);
       const tokens = await this.signTokens(user, payload.sessionId);
 
       return this.buildAuthResponse(user, tokens);
@@ -123,7 +152,8 @@ export class AuthService {
     }
   }
 
-  logout() {
+  async logout(userId: string, sessionId: string) {
+    await this.sessionsService.revokeSession(sessionId, userId);
     return { message: 'Logged out successfully' };
   }
 
