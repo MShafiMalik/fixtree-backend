@@ -7,6 +7,7 @@ import { CloudinaryModule } from './shared/cloudinary/cloudinary.module';
 import { SendGridModule } from './shared/sendgrid/sendgrid.module';
 import { TwilioModule } from './shared/twilio/twilio.module';
 import { UploadModule } from './shared/upload/upload.module';
+import { UsersModule } from './modules/users/users.module';
 import { RequestIdMiddleware } from './common/middleware/request-id.middleware';
 
 @Module({
@@ -19,6 +20,7 @@ import { RequestIdMiddleware } from './common/middleware/request-id.middleware';
     SendGridModule,
     TwilioModule,
     UploadModule,
+    UsersModule,
   ],
 })
 export class AppModule implements NestModule {
