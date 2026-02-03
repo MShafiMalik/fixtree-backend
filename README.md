@@ -48,32 +48,32 @@ A scalable, production-ready NestJS backend for the Fixtree physical service mar
 
 ## Tech Stack
 
-| Category | Technology | Version |
-|----------|------------|---------|
-| **Framework** | NestJS | ^11.x |
-| **Language** | TypeScript | ^5.x |
-| **Database** | PostgreSQL | ^16.x |
-| **ORM** | TypeORM | ^0.3.x |
-| **Cache/Queue** | Redis | ^7.x |
-| **Job Queue** | BullMQ | ^5.x |
-| **Authentication** | Passport + JWT | ^0.7.x |
-| **Google OAuth** | google-auth-library | ^9.x |
-| **Validation** | class-validator | ^0.14.x |
-| **File Upload** | Cloudinary | ^2.x |
-| **Email** | SendGrid | ^8.x |
-| **SMS** | Twilio | ^5.x |
-| **API Docs** | Swagger | ^8.x |
-| **Logging** | Winston | ^3.x |
-| **Security** | Helmet | ^8.x |
-| **User Agent** | Bowser | ^2.x |
-| **Code Formatter** | Prettier | ^3.x |
-| **Linter** | ESLint | ^9.x |
-| **Git Hooks** | Husky | ^9.x |
-| **Staged Linting** | lint-staged | ^15.x |
-| **Commit Linting** | commitlint | ^19.x |
-| **Env Validation** | Joi | ^17.x |
-| **Containerization** | Docker | ^24.x |
-| **CI/CD** | GitHub Actions | - |
+| Category             | Technology          | Version |
+| -------------------- | ------------------- | ------- |
+| **Framework**        | NestJS              | ^11.x   |
+| **Language**         | TypeScript          | ^5.x    |
+| **Database**         | PostgreSQL          | ^16.x   |
+| **ORM**              | TypeORM             | ^0.3.x  |
+| **Cache/Queue**      | Redis               | ^7.x    |
+| **Job Queue**        | BullMQ              | ^5.x    |
+| **Authentication**   | Passport + JWT      | ^0.7.x  |
+| **Google OAuth**     | google-auth-library | ^9.x    |
+| **Validation**       | class-validator     | ^0.14.x |
+| **File Upload**      | Cloudinary          | ^2.x    |
+| **Email**            | SendGrid            | ^8.x    |
+| **SMS**              | Twilio              | ^5.x    |
+| **API Docs**         | Swagger             | ^8.x    |
+| **Logging**          | Winston             | ^3.x    |
+| **Security**         | Helmet              | ^8.x    |
+| **User Agent**       | Bowser              | ^2.x    |
+| **Code Formatter**   | Prettier            | ^3.x    |
+| **Linter**           | ESLint              | ^9.x    |
+| **Git Hooks**        | Husky               | ^9.x    |
+| **Staged Linting**   | lint-staged         | ^15.x   |
+| **Commit Linting**   | commitlint          | ^19.x   |
+| **Env Validation**   | Joi                 | ^17.x   |
+| **Containerization** | Docker              | ^24.x   |
+| **CI/CD**            | GitHub Actions      | -       |
 
 ---
 
@@ -354,12 +354,12 @@ fixtree-backend/
 
 ## User Roles
 
-| Role | Description | Registration | Permissions |
-|------|-------------|--------------|-------------|
-| **BUYER** | Service consumer | Public `/auth/register` | Browse, book, review services |
-| **SELLER** | Service provider | Public `/auth/register` | Create services, manage bookings |
-| **ADMIN** | Platform manager | Created by Super Admin | Manage users, moderate content |
-| **SUPER_ADMIN** | System owner | Database seeder | Full access, create admins |
+| Role            | Description      | Registration            | Permissions                      |
+| --------------- | ---------------- | ----------------------- | -------------------------------- |
+| **BUYER**       | Service consumer | Public `/auth/register` | Browse, book, review services    |
+| **SELLER**      | Service provider | Public `/auth/register` | Create services, manage bookings |
+| **ADMIN**       | Platform manager | Created by Super Admin  | Manage users, moderate content   |
+| **SUPER_ADMIN** | System owner     | Database seeder         | Full access, create admins       |
 
 ---
 
@@ -371,11 +371,17 @@ fixtree-backend/
 GET    /health                          # System health status
 ```
 
+### Auth Flow (Strict Verification)
+
+- Users must **verify email or phone** before login is allowed.
+- Registration sends a verification link/OTP.
+- Login is blocked until `isEmailVerified` or `isPhoneVerified` is true.
+
 ### Auth - User (Buyer/Seller)
 
 ```
 POST   /auth/register                   # Register new user
-POST   /auth/login                      # Login, get tokens
+POST   /auth/login                      # Login (requires email/phone verification)
 POST   /auth/google                     # Google OAuth login
 POST   /auth/refresh-token              # Refresh access token
 POST   /auth/logout                     # Logout current device
@@ -439,13 +445,13 @@ GET    /docs                            # Swagger UI
 
 ### Multi-Environment Setup
 
-| File | Purpose | Git |
-|------|---------|-----|
-| `.env.example` | Template with all variables | Committed |
-| `.env.development` | Development configuration | Ignored |
-| `.env.staging` | Staging configuration | Ignored |
-| `.env.production` | Production configuration | Ignored |
-| `.env` | Local overrides | Ignored |
+| File               | Purpose                     | Git       |
+| ------------------ | --------------------------- | --------- |
+| `.env.example`     | Template with all variables | Committed |
+| `.env.development` | Development configuration   | Ignored   |
+| `.env.staging`     | Staging configuration       | Ignored   |
+| `.env.production`  | Production configuration    | Ignored   |
+| `.env`             | Local overrides             | Ignored   |
 
 ### Loading Priority
 
@@ -1029,7 +1035,9 @@ export class TwilioService {
       this.configService.get<string>('twilio.accountSid'),
       this.configService.get<string>('twilio.authToken'),
     );
-    this.verifyServiceSid = this.configService.get<string>('twilio.verifyServiceSid');
+    this.verifyServiceSid = this.configService.get<string>(
+      'twilio.verifyServiceSid',
+    );
   }
 
   // Send SMS
@@ -1067,9 +1075,7 @@ export class TwilioService {
   async sendBulkSms(
     recipients: { to: string; message: string }[],
   ): Promise<void> {
-    await Promise.all(
-      recipients.map((r) => this.sendSms(r.to, r.message)),
-    );
+    await Promise.all(recipients.map((r) => this.sendSms(r.to, r.message)));
   }
 }
 ```
@@ -1321,7 +1327,10 @@ export interface ApiResponse<T> {
 }
 
 @Injectable()
-export class ResponseInterceptor<T> implements NestInterceptor<T, ApiResponse<T>> {
+export class ResponseInterceptor<T> implements NestInterceptor<
+  T,
+  ApiResponse<T>
+> {
   intercept(
     context: ExecutionContext,
     next: CallHandler,
@@ -1436,7 +1445,7 @@ import twilioConfig from './twilio.config';
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: [
-        '.env',                                    // Local overrides (highest priority)
+        '.env', // Local overrides (highest priority)
         `.env.${process.env.NODE_ENV || 'development'}`, // Environment-specific
       ],
       load: [
@@ -1994,6 +2003,7 @@ bugfix/*    → Bug fixes (PR to develop)
 ```
 
 **Workflow:**
+
 1. Create feature branch from `develop`
 2. Make changes and commit (conventional commits enforced)
 3. Push and create PR to `develop`
@@ -2003,11 +2013,11 @@ bugfix/*    → Bug fixes (PR to develop)
 
 ### CI/CD Pipeline
 
-| Trigger | Actions |
-|---------|---------|
+| Trigger                        | Actions                     |
+| ------------------------------ | --------------------------- |
 | Push/PR to `main` or `develop` | Lint → Format check → Build |
-| Push to `develop` | Deploy to staging server |
-| Push to `main` | Deploy to production server |
+| Push to `develop`              | Deploy to staging server    |
+| Push to `main`                 | Deploy to production server |
 
 ### Commit Message Format
 
@@ -2038,13 +2048,13 @@ Examples:
 
 ### Naming Conventions
 
-| Type | Convention | Example |
-|------|------------|---------|
-| Files | kebab-case | `user.entity.ts`, `jwt-auth.guard.ts` |
-| Classes | PascalCase | `UserEntity`, `JwtAuthGuard` |
-| Methods | camelCase | `findById`, `createUser` |
-| Constants | SCREAMING_SNAKE_CASE | `JWT_SECRET`, `QUEUE_NAME` |
-| Interfaces | PascalCase with I prefix (optional) | `JwtPayload`, `IApiResponse` |
+| Type       | Convention                          | Example                               |
+| ---------- | ----------------------------------- | ------------------------------------- |
+| Files      | kebab-case                          | `user.entity.ts`, `jwt-auth.guard.ts` |
+| Classes    | PascalCase                          | `UserEntity`, `JwtAuthGuard`          |
+| Methods    | camelCase                           | `findById`, `createUser`              |
+| Constants  | SCREAMING_SNAKE_CASE                | `JWT_SECRET`, `QUEUE_NAME`            |
+| Interfaces | PascalCase with I prefix (optional) | `JwtPayload`, `IApiResponse`          |
 
 ### Module Structure
 

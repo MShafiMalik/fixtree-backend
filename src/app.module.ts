@@ -8,6 +8,7 @@ import { SendGridModule } from './shared/sendgrid/sendgrid.module';
 import { TwilioModule } from './shared/twilio/twilio.module';
 import { UploadModule } from './shared/upload/upload.module';
 import { UsersModule } from './modules/users/users.module';
+import { AuthModule } from './modules/auth/auth.module';
 import { RequestIdMiddleware } from './common/middleware/request-id.middleware';
 
 @Module({
@@ -21,6 +22,7 @@ import { RequestIdMiddleware } from './common/middleware/request-id.middleware';
     TwilioModule,
     UploadModule,
     UsersModule,
+    AuthModule,
   ],
 })
 export class AppModule implements NestModule {
