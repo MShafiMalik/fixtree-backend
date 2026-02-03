@@ -8,13 +8,14 @@ export class User extends BaseEntity {
   @Index()
   email: string;
 
-  @Column({ nullable: true })
+  // Explicit types are required for union types like string | null (otherwise TypeORM may see "Object")
+  @Column({ type: 'varchar', length: 255, nullable: true })
   password: string | null;
 
-  @Column()
+  @Column({ type: 'varchar', length: 100 })
   name: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', length: 30, nullable: true })
   phone: string | null;
 
   @Column({ type: 'enum', enum: Role, default: Role.BUYER })
@@ -29,42 +30,66 @@ export class User extends BaseEntity {
   @Column({ name: 'is_active', default: true })
   isActive: boolean;
 
-  @Column({ name: 'google_id', nullable: true, unique: true })
+  @Column({
+    name: 'google_id',
+    type: 'varchar',
+    length: 255,
+    nullable: true,
+    unique: true,
+  })
   @Index()
   googleId: string | null;
 
-  @Column({ name: 'profile_image', nullable: true })
+  @Column({ name: 'profile_image', type: 'text', nullable: true })
   profileImage: string | null;
 
   // Address fields
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', length: 100, nullable: true })
   country: string | null;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', length: 100, nullable: true })
   state: string | null;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', length: 100, nullable: true })
   city: string | null;
 
-  @Column({ name: 'postal_code', nullable: true })
+  @Column({ name: 'postal_code', type: 'varchar', length: 20, nullable: true })
   postalCode: string | null;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', length: 255, nullable: true })
   address: string | null;
 
   // Marketing preferences
   @Column({ name: 'accepts_marketing_emails', default: false })
   acceptsMarketingEmails: boolean;
 
-  @Column({ name: 'email_verification_token', nullable: true })
+  @Column({
+    name: 'email_verification_token',
+    type: 'varchar',
+    length: 255,
+    nullable: true,
+  })
   emailVerificationToken: string | null;
 
-  @Column({ name: 'email_verification_expires', nullable: true })
+  @Column({
+    name: 'email_verification_expires',
+    type: 'timestamptz',
+    nullable: true,
+  })
   emailVerificationExpires: Date | null;
 
-  @Column({ name: 'password_reset_token', nullable: true })
+  @Column({
+    name: 'password_reset_token',
+    type: 'varchar',
+    length: 255,
+    nullable: true,
+  })
   passwordResetToken: string | null;
 
-  @Column({ name: 'password_reset_expires', nullable: true })
+  @Column({
+    name: 'password_reset_expires',
+    type: 'timestamptz',
+    nullable: true,
+  })
   passwordResetExpires: Date | null;
 }

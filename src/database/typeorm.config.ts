@@ -1,5 +1,10 @@
-import { DataSource, DataSourceOptions } from 'typeorm';
+import { DataSource } from 'typeorm';
+import type { DataSourceOptions } from 'typeorm';
 import * as dotenv from 'dotenv';
+import { join } from 'path';
+
+// Support both CJS and ESM execution contexts
+const baseDir = typeof __dirname !== 'undefined' ? __dirname : process.cwd();
 
 // Load environment variables
 dotenv.config({ path: '.env' });
@@ -14,8 +19,8 @@ export const dataSourceOptions: DataSourceOptions = {
   database: process.env.DB_NAME,
   synchronize: process.env.DB_SYNCHRONIZE === 'true',
   logging: process.env.DB_LOGGING === 'true',
-  entities: [__dirname + '/../**/*.entity{.ts,.js}'],
-  migrations: [__dirname + '/migrations/*{.ts,.js}'],
+  entities: [join(baseDir, '/../**/*.entity{.ts,.js}')],
+  migrations: [join(baseDir, '/migrations/*{.ts,.js}')],
 };
 
 // DataSource instance for TypeORM CLI
