@@ -17,4 +17,7 @@ export const APP_CONSTANTS = {
   // Session
   MAX_SESSIONS_PER_USER: 5,
   SESSION_CACHE_TTL: 3600, // 1 hour in seconds
+
+  // Verification
+  VERIFICATION_COOLDOWN_MINUTES: 1,
 };

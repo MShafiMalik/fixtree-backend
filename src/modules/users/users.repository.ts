@@ -23,6 +23,10 @@ export class UsersRepository {
     return this.repository.findOne({ where: { email } });
   }
 
+  async findByPhone(phone: string): Promise<User | null> {
+    return this.repository.findOne({ where: { phone } });
+  }
+
   async findByGoogleId(googleId: string): Promise<User | null> {
     return this.repository.findOne({ where: { googleId } });
   }
@@ -76,6 +80,11 @@ export class UsersRepository {
 
   async existsByEmail(email: string): Promise<boolean> {
     const count = await this.repository.count({ where: { email } });
+    return count > 0;
+  }
+
+  async existsByPhone(phone: string): Promise<boolean> {
+    const count = await this.repository.count({ where: { phone } });
     return count > 0;
   }
 }

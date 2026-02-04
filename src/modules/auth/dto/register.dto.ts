@@ -12,10 +12,15 @@ import {
 import { Type } from 'class-transformer';
 import { Role } from '../../../common/enums/role.enum';
 import { DeviceInfoDto } from './device-info.dto';
+import { AtLeastOne } from '../../../common/validators/at-least-one.validator';
 
 export class RegisterDto {
+  @AtLeastOne(['email', 'phone'], {
+    message: 'Either email or phone is required',
+  })
   @IsEmail()
-  email: string;
+  @IsOptional()
+  email?: string;
 
   @IsString()
   @MinLength(8)

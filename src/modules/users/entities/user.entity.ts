@@ -4,18 +4,17 @@ import { Role } from '../../../common/enums/role.enum';
 
 @Entity('users')
 export class User extends BaseEntity {
-  @Column({ unique: true })
+  @Column({ type: 'varchar', length: 255, unique: true, nullable: true })
   @Index()
-  email: string;
+  email: string | null;
 
-  // Explicit types are required for union types like string | null (otherwise TypeORM may see "Object")
   @Column({ type: 'varchar', length: 255, nullable: true })
   password: string | null;
 
   @Column({ type: 'varchar', length: 100 })
   name: string;
 
-  @Column({ type: 'varchar', length: 30, nullable: true })
+  @Column({ type: 'varchar', length: 30, nullable: true, unique: true })
   phone: string | null;
 
   @Column({ type: 'enum', enum: Role, default: Role.BUYER })
@@ -77,6 +76,20 @@ export class User extends BaseEntity {
     nullable: true,
   })
   emailVerificationExpires: Date | null;
+
+  @Column({
+    name: 'email_verification_sent_at',
+    type: 'timestamptz',
+    nullable: true,
+  })
+  emailVerificationSentAt: Date | null;
+
+  @Column({
+    name: 'phone_verification_sent_at',
+    type: 'timestamptz',
+    nullable: true,
+  })
+  phoneVerificationSentAt: Date | null;
 
   @Column({
     name: 'password_reset_token',

@@ -7,10 +7,19 @@ import {
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { DeviceInfoDto } from './device-info.dto';
+import { AtLeastOne } from '../../../common/validators/at-least-one.validator';
 
 export class LoginDto {
+  @AtLeastOne(['email', 'phone'], {
+    message: 'Either email or phone is required',
+  })
   @IsEmail()
-  email: string;
+  @IsOptional()
+  email?: string;
+
+  @IsString()
+  @IsOptional()
+  phone?: string;
 
   @IsString()
   @MinLength(8)

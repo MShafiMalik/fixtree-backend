@@ -17,11 +17,22 @@ export class UsersService {
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> {
-    const existingUser = await this.usersRepository.findByEmail(
-      createUserDto.email,
-    );
-    if (existingUser) {
-      throw new ConflictException('Email already exists');
+    if (createUserDto.email) {
+      const existingUser = await this.usersRepository.findByEmail(
+        createUserDto.email,
+      );
+      if (existingUser) {
+        throw new ConflictException('Email already exists');
+      }
+    }
+
+    if (createUserDto.phone) {
+      const existingPhone = await this.usersRepository.findByPhone(
+        createUserDto.phone,
+      );
+      if (existingPhone) {
+        throw new ConflictException('Phone number already exists');
+      }
     }
 
     // Hash password if provided
@@ -46,13 +57,16 @@ export class UsersService {
     return this.usersRepository.findByEmail(email);
   }
 
+  async findByPhone(phone: string): Promise<User | null> {
+    return this.usersRepository.findByPhone(phone);
+  }
+
   async findByGoogleId(googleId: string): Promise<User | null> {
     return this.usersRepository.findByGoogleId(googleId);
   }
 
   async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
-    const user = await this.findById(id);
-    const updated = await this.usersRepository.update(user.id, updateUserDto);
+    const updated = await this.usersRepository.update(id, updateUserDto);
     if (!updated) {
       throw new NotFoundException('User not found');
     }
@@ -67,6 +81,7 @@ export class UsersService {
     await this.usersRepository.update(userId, {
       emailVerificationToken: token,
       emailVerificationExpires: expiresAt,
+      emailVerificationSentAt: new Date(),
     });
   }
 
@@ -135,6 +150,30 @@ export class UsersService {
   async updatePassword(userId: string, newPassword: string): Promise<void> {
     const hashedPassword = await this.utilService.hashPassword(newPassword);
     await this.usersRepository.update(userId, { password: hashedPassword });
+  }
+
+  async setPhoneVerified(userId: string, phone?: string): Promise<void> {
+    await this.usersRepository.update(userId, {
+      isPhoneVerified: true,
+      phone: phone ?? undefined,
+    });
+  }
+
+  async setPhoneNumber(userId: string, phone: string): Promise<void> {
+    const existingPhone = await this.usersRepository.findByPhone(phone);
+    if (existingPhone && existingPhone.id !== userId) {
+      throw new ConflictException('Phone number already exists');
+    }
+    await this.usersRepository.update(userId, {
+      phone,
+      isPhoneVerified: false,
+    });
+  }
+
+  async setPhoneVerificationSentAt(userId: string): Promise<void> {
+    await this.usersRepository.update(userId, {
+      phoneVerificationSentAt: new Date(),
+    });
   }
 
   async findOrCreateByGoogle(googleData: {

@@ -1,4 +1,12 @@
-import { Controller, Post, Body, UseGuards, Req } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  UseGuards,
+  Req,
+  Get,
+  Patch,
+} from '@nestjs/common';
 import type { Request } from 'express';
 import { AuthService } from './auth.service';
 import { Public } from '../../common/decorators/public.decorator';
@@ -9,6 +17,14 @@ import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { GoogleLoginDto } from './dto/google-login.dto';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import type { JwtPayload } from '../../common/types/jwt-payload.type';
+import { ResendEmailVerificationDto } from './dto/resend-email-verification.dto';
+import { VerifyEmailDto } from './dto/verify-email.dto';
+import { VerifyPhoneDto } from './dto/verify-phone.dto';
+import { ResendPhoneVerificationDto } from './dto/resend-phone-verification.dto';
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
+import { ChangePasswordDto } from './dto/change-password.dto';
+import { UpdateProfileDto } from './dto/update-profile.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -46,9 +62,81 @@ export class AuthController {
     return this.authService.refreshTokens(refreshTokenDto.refreshToken);
   }
 
+  @Post('send-email-verification')
+  @UseGuards(JwtAuthGuard)
+  sendEmailVerification(@CurrentUser() user: JwtPayload) {
+    return this.authService.sendEmailVerification(user.sub);
+  }
+
+  @Public()
+  @Post('resend-email-verification')
+  resendEmailVerification(@Body() dto: ResendEmailVerificationDto) {
+    return this.authService.resendEmailVerification(dto);
+  }
+
+  @Public()
+  @Post('verify-email')
+  verifyEmail(@Body() dto: VerifyEmailDto) {
+    return this.authService.verifyEmail(dto);
+  }
+
+  @Post('send-phone-verification')
+  @UseGuards(JwtAuthGuard)
+  sendPhoneVerification(@CurrentUser() user: JwtPayload) {
+    return this.authService.sendPhoneVerification(user.sub);
+  }
+
+  @Public()
+  @Post('resend-phone-verification')
+  resendPhoneVerification(@Body() dto: ResendPhoneVerificationDto) {
+    return this.authService.resendPhoneVerification(dto);
+  }
+
+  @Public()
+  @Post('verify-phone')
+  verifyPhone(@Body() dto: VerifyPhoneDto) {
+    return this.authService.verifyPhone(dto);
+  }
+
+  @Public()
+  @Post('forgot-password')
+  forgotPassword(@Body() dto: ForgotPasswordDto) {
+    return this.authService.forgotPassword(dto);
+  }
+
+  @Public()
+  @Post('reset-password')
+  resetPassword(@Body() dto: ResetPasswordDto) {
+    return this.authService.resetPassword(dto);
+  }
+
   @UseGuards(JwtAuthGuard)
   @Post('logout')
   logout(@CurrentUser() user: JwtPayload) {
     return this.authService.logout(user.sub, user.sessionId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('change-password')
+  changePassword(
+    @CurrentUser() user: JwtPayload,
+    @Body() dto: ChangePasswordDto,
+  ) {
+    return this.authService.changePassword(user.sub, dto);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('me')
+  getMe(@CurrentUser() user: JwtPayload) {
+    return this.authService.getMe(user.sub);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch('profile')
+  updateProfile(
+    @CurrentUser() user: JwtPayload,
+    @Body() dto: UpdateProfileDto,
+  ) {
+    return this.authService.updateProfile(user.sub, dto);
   }
 }

@@ -2,7 +2,10 @@ import { Role } from '../enums/role.enum';
 
 export interface JwtPayload {
   sub: string; // User ID
-  email: string;
+  email?: string | null;
+  phone?: string | null;
+  isEmailVerified?: boolean;
+  isPhoneVerified?: boolean;
   role: Role;
   sessionId: string;
   iat?: number;
