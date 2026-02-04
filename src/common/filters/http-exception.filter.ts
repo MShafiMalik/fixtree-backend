@@ -34,15 +34,32 @@ export class HttpExceptionFilter implements ExceptionFilter {
         code = HttpStatus[status] || 'UNKNOWN_ERROR';
       } else {
         const responseObj = exceptionResponse as Record<string, unknown>;
-        message =
-          typeof responseObj.message === 'string'
-            ? responseObj.message
-            : exception.message;
+
+        // Handle validation errors (message is an array)
+        if (Array.isArray(responseObj.message)) {
+          message = responseObj.message.join(', ');
+          details = responseObj.message;
+        } else if (typeof responseObj.message === 'string') {
+          message = responseObj.message;
+        } else {
+          message = exception.message;
+        }
+
         code =
           typeof responseObj.error === 'string'
             ? responseObj.error
             : HttpStatus[status] || 'UNKNOWN_ERROR';
-        details = responseObj.details;
+
+        // Include validation details if not already set
+        if (
+          !details &&
+          responseObj.message &&
+          Array.isArray(responseObj.message)
+        ) {
+          details = responseObj.message;
+        } else if (!details && responseObj.details) {
+          details = responseObj.details;
+        }
       }
     } else if (exception instanceof Error) {
       status = HttpStatus.INTERNAL_SERVER_ERROR;

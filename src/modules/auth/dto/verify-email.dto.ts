@@ -1,6 +1,7 @@
-import { IsString } from 'class-validator';
+import { IsNotEmpty, IsString } from 'class-validator';
 
 export class VerifyEmailDto {
-  @IsString()
+  @IsNotEmpty({ message: 'Token is required' })
+  @IsString({ message: 'Token must be a string' })
   token: string;
 }

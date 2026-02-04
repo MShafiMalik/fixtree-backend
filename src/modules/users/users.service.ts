@@ -95,7 +95,9 @@ export class UsersService {
       user.emailVerificationExpires &&
       user.emailVerificationExpires < new Date()
     ) {
-      throw new ConflictException('Verification token has expired');
+      throw new ConflictException(
+        'Verification token has expired. Please request a new verification email.',
+      );
     }
 
     const updated = await this.usersRepository.update(user.id, {

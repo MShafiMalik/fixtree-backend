@@ -68,11 +68,11 @@ export class AuthService {
         expiresAt,
       );
 
-      await this.sendGridService.sendEmail({
-        to: user.email,
-        subject: 'Verify your email',
-        html: `<p>Your verification token is: <strong>${token}</strong></p>`,
-      });
+      // await this.sendGridService.sendEmail({
+      //   to: user.email,
+      //   subject: 'Verify your email',
+      //   html: `<p>Your verification token is: <strong>${token}</strong></p>`,
+      // });
     }
 
     if (user.phone) {
@@ -214,7 +214,7 @@ export class AuthService {
   async resendEmailVerification(dto: ResendEmailVerificationDto) {
     const user = await this.usersService.findByEmail(dto.email);
     if (!user) {
-      return { message: 'If the email exists, a verification link was sent.' };
+      return { message: 'This email is not registered.' };
     }
 
     if (user.isEmailVerified) {
@@ -240,34 +240,6 @@ export class AuthService {
     return { message: 'Verification email sent.' };
   }
 
-  async sendEmailVerification(userId: string) {
-    const user = await this.usersService.findById(userId);
-    if (!user.email) {
-      return { message: 'No email is set for this account.' };
-    }
-
-    if (user.isEmailVerified) {
-      return { message: 'Email already verified.' };
-    }
-
-    this.assertVerificationCooldown(user.emailVerificationSentAt);
-    const token = this.utilService.generateRandomString(48);
-    const expiresAt = this.utilService.addMinutes(new Date(), 60);
-    await this.usersService.setEmailVerificationToken(
-      user.id,
-      token,
-      expiresAt,
-    );
-
-    await this.sendGridService.sendEmail({
-      to: user.email,
-      subject: 'Verify your email',
-      html: `<p>Your verification token is: <strong>${token}</strong></p>`,
-    });
-
-    return { message: 'Verification email sent.' };
-  }
-
   async verifyEmail(dto: VerifyEmailDto) {
     const user = await this.usersService.verifyEmail(dto.token);
     return {
@@ -276,26 +248,10 @@ export class AuthService {
     };
   }
 
-  async sendPhoneVerification(userId: string) {
-    const user = await this.usersService.findById(userId);
-    if (!user.phone) {
-      return { message: 'No phone number is set for this account.' };
-    }
-
-    if (user.isPhoneVerified) {
-      return { message: 'Phone already verified.' };
-    }
-
-    this.assertVerificationCooldown(user.phoneVerificationSentAt);
-    await this.twilioService.sendVerificationCode(user.phone);
-    await this.usersService.setPhoneVerificationSentAt(user.id);
-    return { message: 'Verification code sent.' };
-  }
-
   async resendPhoneVerification(dto: ResendPhoneVerificationDto) {
     const user = await this.usersService.findByPhone(dto.phone);
     if (!user) {
-      return { message: 'If the phone exists, a verification code was sent.' };
+      return { message: 'This phone number is not registered.' };
     }
 
     if (user.isPhoneVerified) {
@@ -326,7 +282,7 @@ export class AuthService {
   async forgotPassword(dto: ForgotPasswordDto) {
     const user = await this.usersService.findByEmail(dto.email);
     if (!user) {
-      return { message: 'If the email exists, a reset link was sent.' };
+      return { message: 'This email is not registered.' };
     }
 
     const token = this.utilService.generateRandomString(48);

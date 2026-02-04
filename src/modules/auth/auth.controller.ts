@@ -62,12 +62,6 @@ export class AuthController {
     return this.authService.refreshTokens(refreshTokenDto.refreshToken);
   }
 
-  @Post('send-email-verification')
-  @UseGuards(JwtAuthGuard)
-  sendEmailVerification(@CurrentUser() user: JwtPayload) {
-    return this.authService.sendEmailVerification(user.sub);
-  }
-
   @Public()
   @Post('resend-email-verification')
   resendEmailVerification(@Body() dto: ResendEmailVerificationDto) {
@@ -78,12 +72,6 @@ export class AuthController {
   @Post('verify-email')
   verifyEmail(@Body() dto: VerifyEmailDto) {
     return this.authService.verifyEmail(dto);
-  }
-
-  @Post('send-phone-verification')
-  @UseGuards(JwtAuthGuard)
-  sendPhoneVerification(@CurrentUser() user: JwtPayload) {
-    return this.authService.sendPhoneVerification(user.sub);
   }
 
   @Public()
