@@ -45,9 +45,13 @@ export class AuthService {
     private readonly sendGridService: SendGridService,
     private readonly twilioService: TwilioService,
   ) {
+    const googleClientIds =
+      this.configService.get<string[]>('google.clientIds');
     const googleClientId = this.configService.get<string>('google.clientId');
-    if (googleClientId) {
-      this.googleClient = new OAuth2Client(googleClientId);
+    if (googleClientId || (googleClientIds?.length ?? 0) > 0) {
+      this.googleClient = new OAuth2Client(
+        googleClientId ?? googleClientIds?.[0],
+      );
     }
   }
 
@@ -150,14 +154,20 @@ export class AuthService {
       userAgent?: string;
     },
   ) {
+    const clientIds = this.configService.get<string[]>('google.clientIds');
     const clientId = this.configService.get<string>('google.clientId');
-    if (!clientId || !this.googleClient) {
+    const audiences = clientIds?.length
+      ? clientIds
+      : clientId
+        ? [clientId]
+        : [];
+    if (!audiences.length || !this.googleClient) {
       throw new UnauthorizedException('Google login is not configured');
     }
 
     const ticket = await this.googleClient.verifyIdToken({
       idToken: googleLoginDto.idToken,
-      audience: clientId,
+      audience: audiences,
     });
 
     const payload = ticket.getPayload();
