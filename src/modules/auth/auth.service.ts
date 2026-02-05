@@ -68,11 +68,11 @@ export class AuthService {
         expiresAt,
       );
 
-      // await this.sendGridService.sendEmail({
-      //   to: user.email,
-      //   subject: 'Verify your email',
-      //   html: `<p>Your verification token is: <strong>${token}</strong></p>`,
-      // });
+      await this.sendGridService.sendEmail({
+        to: user.email,
+        subject: 'Verify your email',
+        html: `<p>Your verification token is: <strong>${token}</strong></p>`,
+      });
     }
 
     if (user.phone) {

@@ -34,6 +34,20 @@ export class SendGridService {
 
   async sendEmail(options: SendEmailOptions): Promise<void> {
     try {
+      const text = options.text?.trim() ?? '';
+      const html = options.html?.trim() ?? '';
+      if (!text && !html && !options.templateId) {
+        throw new Error(
+          'Email must have at least one of: text, html, or templateId',
+        );
+      }
+      const contentPart = options.templateId
+        ? { templateId: options.templateId }
+        : text && html
+          ? { text, html }
+          : html
+            ? { html }
+            : { text };
       const msg = {
         to: options.to,
         from: {
@@ -41,13 +55,11 @@ export class SendGridService {
           name: this.fromName,
         },
         subject: options.subject,
-        text: options.text ?? '',
-        html: options.html ?? '',
-        ...(options.templateId && { templateId: options.templateId }),
+        ...contentPart,
         ...(options.dynamicTemplateData && {
           dynamicTemplateData: options.dynamicTemplateData,
         }),
-      } satisfies MailDataRequired;
+      } as MailDataRequired;
 
       await sgMail.send(msg);
       this.logger.log(`Email sent to ${options.to}`, 'SendGridService');
