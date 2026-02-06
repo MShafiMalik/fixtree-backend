@@ -8,24 +8,25 @@ Each stage is a separate commit. Complete one stage before moving to the next.
 
 ## Progress Overview
 
-| Stage | Description | Status |
-|-------|-------------|--------|
-| 1 | Project Setup & Configuration | ⬜ Pending |
-| 2 | Common Utilities | ⬜ Pending |
-| 3 | Database Setup | ⬜ Pending |
-| 4 | Shared Services | ⬜ Pending |
-| 5 | Users Module | ⬜ Pending |
-| 6 | Auth Module (Basic) | ⬜ Pending |
-| 7 | Sessions Module | ⬜ Pending |
-| 8 | Auth Module (Extended) | ⬜ Pending |
-| 9 | Admin Modules | ⬜ Pending |
-| 10 | Queue & Cron Jobs | ⬜ Pending |
-| 11 | Notifications Module | ⬜ Pending |
-| 12 | Health Check & Swagger | ⬜ Pending |
-| 13 | Database Seeders | ⬜ Pending |
-| 14 | Docker Setup | ⬜ Pending |
-| 15 | CI/CD Pipeline | ⬜ Pending |
-| 16 | Final Integration & Testing | ⬜ Pending |
+| Stage | Description                   | Status       |
+| ----- | ----------------------------- | ------------ |
+| 1     | Project Setup & Configuration | ✅ Completed |
+| 2     | Common Utilities              | ✅ Completed |
+| 3     | Database Setup                | ✅ Completed |
+| 4     | Shared Services               | ✅ Completed |
+| 5     | Users Module                  | ✅ Completed |
+| 6     | Auth Module (Basic)           | ✅ Completed |
+| 7     | Sessions Module               | ✅ Completed |
+| 8     | Auth Module (Extended)        | ✅ Completed |
+| 9     | Seller Module                 | ⬜ Pending   |
+| 10    | Admin Modules                 | ⬜ Pending   |
+| 11    | Queue & Cron Jobs             | ⬜ Pending   |
+| 12    | Notifications Module          | ⬜ Pending   |
+| 13    | Health Check & Swagger        | ⬜ Pending   |
+| 14    | Database Seeders              | ✅ Completed |
+| 15    | Docker Setup                  | ⬜ Pending   |
+| 16    | CI/CD Pipeline                | ⬜ Pending   |
+| 17    | Final Integration & Testing   | ⬜ Pending   |
 
 **Legend:** ⬜ Pending | 🔄 In Progress | ✅ Completed
 
@@ -36,17 +37,19 @@ Each stage is a separate commit. Complete one stage before moving to the next.
 **Commit:** `feat: project setup and configuration`
 
 **Tasks:**
+
 - [x] Initialize NestJS project
-- [ ] Setup multi-environment files (`.env.example`, `.env.development`)
-- [ ] Create Joi validation schema for environment variables
-- [ ] Setup Husky, lint-staged, and commitlint
-- [ ] Configure Prettier (`.prettierrc`)
-- [ ] Configure ESLint strict mode (`eslint.config.mjs`)
-- [ ] Create `config/` module with all config files
-- [ ] Setup `app.module.ts` with ConfigModule
-- [ ] Configure `main.ts` (Helmet, CORS, global prefix)
+- [x] Setup multi-environment files (`.env.example`, `.env.development`)
+- [x] Create Joi validation schema for environment variables
+- [x] Setup Husky, lint-staged, and commitlint
+- [x] Configure Prettier (`.prettierrc`)
+- [x] Configure ESLint strict mode (`eslint.config.mjs`)
+- [x] Create `config/` module with all config files
+- [x] Setup `app.module.ts` with ConfigModule
+- [x] Configure `main.ts` (Helmet, CORS, global prefix)
 
 **Files to create:**
+
 ```
 # Environment files
 .env.example              # Template (committed)
@@ -82,11 +85,13 @@ src/
 ```
 
 **Dependencies to install:**
+
 ```bash
 npm install @nestjs/config helmet joi
 ```
 
 **Multi-environment setup:**
+
 ```
 .env.example        # Template with all variables (committed)
 .env.development    # Development config (git ignored)
@@ -96,44 +101,50 @@ npm install @nestjs/config helmet joi
 ```
 
 **Loading order (ConfigModule):**
+
 ```typescript
 envFilePath: [
-  '.env',                                      // Local overrides
+  '.env', // Local overrides
   `.env.${process.env.NODE_ENV || 'development'}`, // Environment-specific
-]
+];
 ```
 
 **Environment validation (env.validation.ts):**
+
 ```typescript
 import * as Joi from 'joi';
 
 export const envValidationSchema = Joi.object({
-  NODE_ENV: Joi.string().valid('development', 'staging', 'production').required(),
+  NODE_ENV: Joi.string()
+    .valid('development', 'staging', 'production')
+    .required(),
   PORT: Joi.number().default(3000),
-  
+
   // Database
   DB_HOST: Joi.string().required(),
   DB_PORT: Joi.number().default(5432),
   DB_USERNAME: Joi.string().required(),
   DB_PASSWORD: Joi.string().required(),
   DB_NAME: Joi.string().required(),
-  
+
   // JWT
   JWT_SECRET: Joi.string().min(32).required(),
   JWT_EXPIRES_IN: Joi.string().default('15m'),
   JWT_REFRESH_SECRET: Joi.string().min(32).required(),
   JWT_REFRESH_EXPIRES_IN: Joi.string().default('7d'),
-  
+
   // ... other validations
 });
 ```
 
 **Dev dependencies for code quality:**
+
 ```bash
 npm install -D husky lint-staged @commitlint/cli @commitlint/config-conventional
 ```
 
 **Husky setup commands:**
+
 ```bash
 # Initialize Husky
 npx husky init
@@ -146,6 +157,7 @@ echo "npx --no -- commitlint --edit \$1" > .husky/commit-msg
 ```
 
 **Prettier configuration (`.prettierrc`):**
+
 ```json
 {
   "semi": true,
@@ -161,6 +173,7 @@ echo "npx --no -- commitlint --edit \$1" > .husky/commit-msg
 ```
 
 **lint-staged configuration (`.lintstagedrc`):**
+
 ```json
 {
   "*.ts": ["prettier --write", "eslint --fix"],
@@ -169,6 +182,7 @@ echo "npx --no -- commitlint --edit \$1" > .husky/commit-msg
 ```
 
 **commitlint configuration (`.commitlintrc`):**
+
 ```json
 {
   "extends": ["@commitlint/config-conventional"],
@@ -176,7 +190,19 @@ echo "npx --no -- commitlint --edit \$1" > .husky/commit-msg
     "type-enum": [
       2,
       "always",
-      ["feat", "fix", "docs", "style", "refactor", "perf", "test", "chore", "revert", "build", "ci"]
+      [
+        "feat",
+        "fix",
+        "docs",
+        "style",
+        "refactor",
+        "perf",
+        "test",
+        "chore",
+        "revert",
+        "build",
+        "ci"
+      ]
     ],
     "subject-case": [2, "always", "lower-case"],
     "subject-max-length": [2, "always", 72]
@@ -185,6 +211,7 @@ echo "npx --no -- commitlint --edit \$1" > .husky/commit-msg
 ```
 
 **Commit message format:**
+
 ```
 <type>: <subject>
 
@@ -203,18 +230,20 @@ refactor: restructure auth module
 **Commit:** `feat: common utilities and helpers`
 
 **Tasks:**
-- [ ] Create constants (app, queue)
-- [ ] Create enums (role, platform)
-- [ ] Create decorators (roles, current-user, public)
-- [ ] Create guards (jwt-auth, roles)
-- [ ] Create interceptors (response, logging, audit-log)
-- [ ] Create filters (http-exception)
-- [ ] Create middleware (request-id)
-- [ ] Create pipes (validation)
-- [ ] Create types (jwt-payload, api-response)
-- [ ] Create utils module and service
+
+- [x] Create constants (app, queue)
+- [x] Create enums (role, platform)
+- [x] Create decorators (roles, current-user, public)
+- [x] Create guards (jwt-auth, roles)
+- [x] Create interceptors (response, logging, audit-log)
+- [x] Create filters (http-exception)
+- [x] Create middleware (request-id)
+- [x] Create pipes (validation)
+- [x] Create types (jwt-payload, api-response)
+- [x] Create utils module and service
 
 **Files to create:**
+
 ```
 src/common/
 ├── constants/
@@ -252,6 +281,7 @@ src/common/
 ```
 
 **Dependencies to install:**
+
 ```bash
 npm install class-validator class-transformer bcrypt
 npm install -D @types/bcrypt
@@ -264,14 +294,16 @@ npm install -D @types/bcrypt
 **Commit:** `feat: database configuration and base entity`
 
 **Tasks:**
-- [ ] Install TypeORM and PostgreSQL driver
-- [ ] Create `database/typeorm.module.ts`
-- [ ] Create `database/typeorm.config.ts`
-- [ ] Create `database/entities/base.entity.ts` (with soft delete)
-- [ ] Setup migrations directory
-- [ ] Create seeder module structure
+
+- [x] Install TypeORM and PostgreSQL driver
+- [x] Create `database/typeorm.module.ts`
+- [x] Create `database/typeorm.config.ts`
+- [x] Create `database/entities/base.entity.ts` (with soft delete)
+- [x] Setup migrations directory
+- [x] Create seeder module structure
 
 **Files to create:**
+
 ```
 src/database/
 ├── typeorm.module.ts
@@ -288,11 +320,13 @@ src/database/
 ```
 
 **Dependencies to install:**
+
 ```bash
 npm install @nestjs/typeorm typeorm pg
 ```
 
 **Add to package.json scripts:**
+
 ```json
 {
   "scripts": {
@@ -311,13 +345,15 @@ npm install @nestjs/typeorm typeorm pg
 **Commit:** `feat: shared services (logger, cloudinary, sendgrid, twilio, upload)`
 
 **Tasks:**
-- [ ] Create logger module (Winston)
-- [ ] Create cloudinary module
-- [ ] Create sendgrid module (email)
-- [ ] Create twilio module (SMS & phone verification)
-- [ ] Create upload module (Multer + Cloudinary)
+
+- [x] Create logger module (Winston)
+- [x] Create cloudinary module
+- [x] Create sendgrid module (email)
+- [x] Create twilio module (SMS & phone verification)
+- [x] Create upload module (Multer + Cloudinary)
 
 **Files to create:**
+
 ```
 src/shared/
 ├── logger/
@@ -339,12 +375,14 @@ src/shared/
 ```
 
 **Dependencies to install:**
+
 ```bash
 npm install winston cloudinary @sendgrid/mail twilio multer
 npm install -D @types/multer
 ```
 
 **Twilio Setup:**
+
 1. Create Twilio account at https://www.twilio.com
 2. Get Account SID and Auth Token from Console
 3. Buy a phone number for sending SMS
@@ -357,14 +395,16 @@ npm install -D @types/multer
 **Commit:** `feat: users module with entity and repository`
 
 **Tasks:**
-- [ ] Create user entity (extends BaseEntity)
-- [ ] Create users repository
-- [ ] Create users service
-- [ ] Create users module
-- [ ] Create DTOs
-- [ ] Generate initial migration
+
+- [x] Create user entity (extends BaseEntity)
+- [x] Create users repository
+- [x] Create users service
+- [x] Create users module
+- [x] Create DTOs
+- [x] Generate initial migration
 
 **Files to create:**
+
 ```
 src/modules/users/
 ├── users.module.ts
@@ -377,6 +417,7 @@ src/modules/users/
 ```
 
 **After creating entity, run:**
+
 ```bash
 npm run migration:generate -- src/database/migrations/CreateUsersTable
 npm run migration:run
@@ -389,17 +430,19 @@ npm run migration:run
 **Commit:** `feat: auth module with JWT authentication`
 
 **Tasks:**
-- [ ] Create auth module, controller, service
-- [ ] Create JWT strategy
-- [ ] Create JWT refresh strategy
-- [ ] Implement register endpoint
-- [ ] Implement login endpoint
-- [ ] Implement Google OAuth login endpoint
-- [ ] Implement refresh token endpoint
-- [ ] Implement logout endpoint
-- [ ] Create auth DTOs
+
+- [x] Create auth module, controller, service
+- [x] Create JWT strategy
+- [x] Create JWT refresh strategy
+- [x] Implement register endpoint
+- [x] Implement login endpoint
+- [x] Implement Google OAuth login endpoint
+- [x] Implement refresh token endpoint
+- [x] Implement logout endpoint
+- [x] Create auth DTOs
 
 **Files to create:**
+
 ```
 src/modules/auth/
 ├── auth.module.ts
@@ -416,12 +459,14 @@ src/modules/auth/
 ```
 
 **Dependencies to install:**
+
 ```bash
 npm install @nestjs/jwt @nestjs/passport passport passport-jwt google-auth-library
 npm install -D @types/passport-jwt
 ```
 
 **Google OAuth Flow (Token Verification):**
+
 ```
 1. Client gets Google ID Token from Google Sign-In SDK
 2. Client sends POST /api/auth/google { idToken, deviceInfo? }
@@ -438,14 +483,16 @@ npm install -D @types/passport-jwt
 **Commit:** `feat: session management with multi-platform support`
 
 **Tasks:**
-- [ ] Create session entity
-- [ ] Create sessions repository
-- [ ] Create sessions service
-- [ ] Create device-parser service (Bowser)
-- [ ] Implement session endpoints
-- [ ] Add Redis caching for sessions
+
+- [x] Create session entity
+- [x] Create sessions repository
+- [x] Create sessions service
+- [x] Create device-parser service (Bowser)
+- [x] Implement session endpoints
+- [x] Add Redis caching for sessions
 
 **Files to create:**
+
 ```
 src/modules/auth/sessions/
 ├── sessions.module.ts
@@ -459,11 +506,13 @@ src/modules/auth/sessions/
 ```
 
 **Dependencies to install:**
+
 ```bash
 npm install bowser ioredis
 ```
 
 **After creating entity, run:**
+
 ```bash
 npm run migration:generate -- src/database/migrations/CreateSessionsTable
 npm run migration:run
@@ -476,16 +525,18 @@ npm run migration:run
 **Commit:** `feat: extended auth features (password, profile, verification)`
 
 **Tasks:**
-- [ ] Implement change password
-- [ ] Implement forgot password
-- [ ] Implement reset password
-- [ ] Implement email verification (send & verify)
-- [ ] Implement phone verification (send OTP & verify)
-- [ ] Implement get profile
-- [ ] Implement update profile
-- [ ] Implement delete account (soft delete)
+
+- [x] Implement change password
+- [x] Implement forgot password
+- [x] Implement reset password
+- [x] Implement email verification (send & verify)
+- [x] Implement phone verification (send OTP & verify)
+- [x] Implement get profile
+- [x] Implement update profile
+- [x] Implement delete account (soft delete)
 
 **Files to create (additional DTOs):**
+
 ```
 src/modules/auth/dto/
 ├── change-password.dto.ts
@@ -498,11 +549,107 @@ src/modules/auth/dto/
 
 ---
 
-## Stage 9: Admin Modules
+## Stage 9: Seller Module
+
+**Commit:** `feat: seller module with auto-creation on registration`
+
+**Tasks:**
+
+- [ ] Create seller entity (one-to-one with User)
+- [ ] Create seller repository
+- [ ] Create seller service
+- [ ] Create seller module
+- [ ] Create seller controller (basic endpoints)
+- [ ] Create seller DTOs (update DTO only)
+- [ ] Update auth service to auto-create seller on registration
+- [ ] Update auth module to import sellers module
+- [ ] Generate migration for seller table
+- [ ] Test seller creation on registration
+
+**Files to create:**
+
+```
+src/modules/sellers/
+├── sellers.module.ts
+├── sellers.service.ts
+├── sellers.repository.ts
+├── sellers.controller.ts
+├── entities/
+│   └── seller.entity.ts
+└── dto/
+    ├── requests/
+    │   └── update-seller.dto.ts
+    └── responses/
+        └── seller-response.dto.ts
+```
+
+**Entity Structure:**
+
+```typescript
+// seller.entity.ts
+@Entity('seller')
+export class Seller extends BaseEntity {
+  @Column({ name: 'user_id', type: 'uuid' })
+  @Index()
+  userId: string;
+
+  @OneToOne(() => User, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'user_id' })
+  user: User;
+
+  @Column({ name: 'is_active', default: true })
+  isActive: boolean;
+}
+```
+
+**Key Points:**
+
+- One-to-one relationship with User
+- `CASCADE` delete: if user is deleted, seller is deleted
+- Minimal fields: `userId`, `user` relation, and `isActive` flag
+- Uses both `userId` (direct column access) and `user` (relation property) - same pattern as Session entity
+- Auto-creates seller when user registers with `role=SELLER`
+
+**Integration with Registration:**
+
+Update `AuthService.register()` method:
+
+```typescript
+// After user creation
+if (user.role === Role.SELLER) {
+  await this.sellersService.create(user.id);
+}
+```
+
+**Endpoints:**
+
+```
+GET    /sellers/profile          # Get seller (SELLER only)
+PATCH  /sellers/profile          # Update seller (SELLER only)
+```
+
+**Dependencies:**
+No new dependencies required. Uses existing:
+
+- `@nestjs/typeorm` (already installed)
+- `class-validator` (already installed)
+- `class-transformer` (already installed)
+
+**After creating entity, run:**
+
+```bash
+npm run migration:generate -- src/database/migrations/CreateSellerTable
+npm run migration:run
+```
+
+---
+
+## Stage 10: Admin Modules
 
 **Commit:** `feat: admin modules (auth and users management)`
 
 **Tasks:**
+
 - [ ] Create admin module (root)
 - [ ] Create admin-auth module, controller, service
 - [ ] Create admin-users module, controller, service
@@ -510,6 +657,7 @@ src/modules/auth/dto/
 - [ ] Implement user management (CRUD, ban/unban)
 
 **Files to create:**
+
 ```
 src/modules/admin/
 ├── admin.module.ts
@@ -525,17 +673,19 @@ src/modules/admin/
 
 ---
 
-## Stage 10: Queue & Cron Jobs
+## Stage 11: Queue & Cron Jobs
 
 **Commit:** `feat: BullMQ queues and cron jobs`
 
 **Tasks:**
+
 - [ ] Create BullMQ module
 - [ ] Create cron module, service, processor
 - [ ] Add example cron job (cleanup sessions)
 - [ ] Test queue functionality
 
 **Files to create:**
+
 ```
 src/queues/
 ├── bullmq.module.ts
@@ -546,17 +696,19 @@ src/queues/
 ```
 
 **Dependencies to install:**
+
 ```bash
 npm install @nestjs/bullmq bullmq
 ```
 
 ---
 
-## Stage 11: Notifications Module
+## Stage 12: Notifications Module
 
 **Commit:** `feat: notifications module with queue processor`
 
 **Tasks:**
+
 - [ ] Create notifications module
 - [ ] Create notifications service
 - [ ] Create notifications processor
@@ -564,6 +716,7 @@ npm install @nestjs/bullmq bullmq
 - [ ] Implement SMS notifications (via Twilio)
 
 **Notification types to implement:**
+
 - Welcome email
 - Password reset email
 - Email verification
@@ -572,6 +725,7 @@ npm install @nestjs/bullmq bullmq
 - Booking reminder SMS
 
 **Files to create:**
+
 ```
 src/modules/notifications/
 ├── notifications.module.ts
@@ -581,17 +735,19 @@ src/modules/notifications/
 
 ---
 
-## Stage 12: Health Check & Swagger
+## Stage 13: Health Check & Swagger
 
 **Commit:** `feat: health check and swagger documentation`
 
 **Tasks:**
+
 - [ ] Create health module and controller
 - [ ] Configure Swagger in main.ts
 - [ ] Add Swagger decorators to all controllers
 - [ ] Test all endpoints via Swagger UI
 
 **Files to create:**
+
 ```
 src/modules/health/
 ├── health.module.ts
@@ -599,34 +755,38 @@ src/modules/health/
 ```
 
 **Dependencies to install:**
+
 ```bash
 npm install @nestjs/swagger @nestjs/terminus
 ```
 
 ---
 
-## Stage 13: Database Seeders
+## Stage 14: Database Seeders
 
 **Commit:** `feat: database seeders for initial data`
 
 **Tasks:**
-- [ ] Implement seeder service
-- [ ] Create super admin seeder
-- [ ] Add seeder command to package.json
+
+- [x] Implement seeder service
+- [x] Create super admin seeder
+- [x] Add seeder command to package.json
 - [ ] Test seeder execution
 
 **Run seeder:**
+
 ```bash
 npm run seed
 ```
 
 ---
 
-## Stage 14: Docker Setup
+## Stage 15: Docker Setup
 
 **Commit:** `chore: docker configuration for development and production`
 
 **Tasks:**
+
 - [ ] Create Dockerfile (production)
 - [ ] Create Dockerfile.dev (development)
 - [ ] Create docker-compose.yml (local development)
@@ -636,6 +796,7 @@ npm run seed
 - [ ] Document Docker commands
 
 **Files to create:**
+
 ```
 Dockerfile
 Dockerfile.dev
@@ -645,6 +806,7 @@ docker-compose.prod.yml
 ```
 
 **Dockerfile (Production):**
+
 ```dockerfile
 FROM node:20-alpine AS builder
 WORKDIR /app
@@ -664,6 +826,7 @@ CMD ["node", "dist/main.js"]
 ```
 
 **docker-compose.yml (Development):**
+
 ```yaml
 version: '3.8'
 services:
@@ -704,6 +867,7 @@ volumes:
 ```
 
 **Docker commands:**
+
 ```bash
 # Development
 docker-compose up -d              # Start all services
@@ -718,11 +882,12 @@ docker run -p 3000:3000 fixtree-backend
 
 ---
 
-## Stage 15: CI/CD Pipeline
+## Stage 16: CI/CD Pipeline
 
 **Commit:** `ci: github actions for CI/CD pipeline`
 
 **Tasks:**
+
 - [ ] Create CI workflow (lint, format, build)
 - [ ] Create staging deployment workflow
 - [ ] Create production deployment workflow
@@ -731,6 +896,7 @@ docker run -p 3000:3000 fixtree-backend
 - [ ] Test deployment pipeline
 
 **Files to create:**
+
 ```
 .github/
 └── workflows/
@@ -740,6 +906,7 @@ docker run -p 3000:3000 fixtree-backend
 ```
 
 **Branch strategy:**
+
 ```
 main        → Production deployment
 develop     → Staging deployment
@@ -748,6 +915,7 @@ hotfix/*    → PR to main
 ```
 
 **CI workflow (ci.yml):**
+
 ```yaml
 name: CI
 on:
@@ -772,6 +940,7 @@ jobs:
 ```
 
 **Deploy staging workflow (deploy-staging.yml):**
+
 ```yaml
 name: Deploy to Staging
 on:
@@ -796,6 +965,7 @@ jobs:
 ```
 
 **Deploy production workflow (deploy-production.yml):**
+
 ```yaml
 name: Deploy to Production
 on:
@@ -820,6 +990,7 @@ jobs:
 ```
 
 **GitHub Secrets to configure:**
+
 ```
 # Staging
 STAGING_HOST          # Staging server IP
@@ -833,6 +1004,7 @@ PRODUCTION_SSH_KEY    # SSH private key
 ```
 
 **VPS Server Setup (Contabo):**
+
 ```bash
 # 1. Install Docker
 sudo apt update
@@ -861,11 +1033,12 @@ sudo apt install nginx -y
 
 ---
 
-## Stage 16: Final Integration & Testing
+## Stage 17: Final Integration & Testing
 
 **Commit:** `feat: final integration and manual testing`
 
 **Tasks:**
+
 - [ ] Verify all modules are imported correctly
 - [ ] Test complete auth flow (register → login → profile → logout)
 - [ ] Test admin flow (login → manage users)
@@ -877,6 +1050,7 @@ sudo apt install nginx -y
 **Testing checklist:**
 
 ### User Auth Flow
+
 - [ ] POST /auth/register - Register buyer
 - [ ] POST /auth/register - Register seller
 - [ ] POST /auth/login - Login user
@@ -895,12 +1069,21 @@ sudo apt install nginx -y
 - [ ] DELETE /auth/sessions - Logout all
 - [ ] POST /auth/logout - Logout current
 
+### Seller Flow
+
+- [ ] POST /auth/register - Register seller (verify seller is auto-created)
+- [ ] GET /sellers/profile - Get seller profile
+- [ ] PATCH /sellers/profile - Update seller profile
+- [ ] GET /sellers/profile as BUYER - Returns 403 Forbidden
+
 ### Admin Auth Flow
+
 - [ ] POST /admin/auth/login - Admin login
 - [ ] GET /admin/auth/profile - Admin profile
 - [ ] GET /admin/auth/sessions - Admin sessions
 
 ### Admin User Management
+
 - [ ] GET /admin/users - List users
 - [ ] GET /admin/users/:id - Get user
 - [ ] POST /admin/users - Create admin (Super Admin)
@@ -910,6 +1093,7 @@ sudo apt install nginx -y
 - [ ] DELETE /admin/users/:id - Delete user
 
 ### Other
+
 - [ ] GET /health - Health check
 - [ ] GET /docs - Swagger UI
 - [ ] Cron jobs running
