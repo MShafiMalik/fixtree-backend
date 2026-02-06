@@ -388,26 +388,26 @@ GET    /health                          # System health status
 ### Auth - User (Buyer/Seller)
 
 ```
-POST   /auth/register                   # Register new user
-POST   /auth/login                      # Login (requires email/phone verification)
-POST   /auth/google                     # Google OAuth login
-POST   /auth/refresh-token              # Refresh access token
-POST   /auth/logout                     # Logout current device
-POST   /auth/change-password            # Change password
-POST   /auth/forgot-password            # Request password reset
-POST   /auth/reset-password             # Reset with token
-POST   /auth/verify-email               # Verify email address
-POST   /auth/send-phone-verification   # Send phone verification OTP
-POST   /auth/verify-phone              # Verify phone OTP
+POST   /auth/register                      # Register new user
+POST   /auth/login                         # Login (requires email/phone verification)
+POST   /auth/google                        # Google OAuth login
+POST   /auth/refresh                       # Refresh access token
+POST   /auth/logout                        # Logout current device
+POST   /auth/password/change               # Change password
+POST   /auth/password/forgot               # Request password reset
+POST   /auth/password/reset                # Reset with token
+POST   /auth/email/resend-verification     # Resend email verification
+POST   /auth/email/verify                  # Verify email address
+POST   /auth/phone/resend-verification     # Resend phone verification OTP
+POST   /auth/phone/verify                  # Verify phone OTP
 
-GET    /auth/profile                    # Get current user profile
-PATCH  /auth/profile                    # Update profile
-DELETE /auth/profile                    # Delete account
+GET    /auth/me                            # Get current user profile
+PATCH  /auth/profile                       # Update profile
 
-GET    /auth/sessions                   # List all sessions
-DELETE /auth/sessions/:id               # Logout specific device
-DELETE /auth/sessions                   # Logout all devices
-DELETE /auth/sessions/others            # Logout other devices
+GET    /auth/sessions                      # List all sessions
+DELETE /auth/sessions/:id                  # Logout specific device
+DELETE /auth/sessions                     # Logout all devices
+DELETE /auth/sessions/others               # Logout other devices
 ```
 
 ### Auth - Admin (Admin/Super Admin)
