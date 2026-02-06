@@ -2,8 +2,8 @@ import {
   IsEmail,
   IsString,
   IsOptional,
-  IsEnum,
   IsBoolean,
+  IsIn,
   MinLength,
   MaxLength,
   Matches,
@@ -40,9 +40,11 @@ export class RegisterDto {
   @IsOptional()
   phone?: string;
 
-  @IsEnum(Role)
+  @IsIn([Role.BUYER, Role.SELLER], {
+    message: 'Role must be either BUYER or SELLER',
+  })
   @IsOptional()
-  role?: Role;
+  role?: Role.BUYER | Role.SELLER;
 
   @IsString()
   @IsOptional()

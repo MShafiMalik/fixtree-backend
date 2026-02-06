@@ -19,6 +19,7 @@ import { User } from '../users/entities/user.entity';
 import { SessionsService } from './sessions/sessions.service';
 import { SendGridService } from '../../shared/sendgrid/sendgrid.service';
 import { TwilioService } from '../../shared/twilio/twilio.service';
+import { UploadService } from '../../shared/upload/upload.service';
 import {
   GoogleLoginDto,
   RegisterDto,
@@ -53,6 +54,7 @@ export class AuthService {
     private readonly sessionsService: SessionsService,
     private readonly sendGridService: SendGridService,
     private readonly twilioService: TwilioService,
+    private readonly uploadService: UploadService,
   ) {
     const googleClientIds =
       this.configService.get<string[]>('google.clientIds');
@@ -64,9 +66,21 @@ export class AuthService {
     }
   }
 
-  async register(registerDto: RegisterDto): Promise<RegisterResponseDto> {
+  async register(
+    registerDto: RegisterDto,
+    file?: Express.Multer.File,
+  ): Promise<RegisterResponseDto> {
     if (registerDto.email && registerDto.phone) {
       throw new BadRequestException('Provide either email or phone, not both');
+    }
+
+    // Upload profile image to Cloudinary if file is provided
+    if (file) {
+      const uploadResult = await this.uploadService.uploadImage(
+        file,
+        'fixtree/profiles',
+      );
+      registerDto.profileImage = uploadResult.secureUrl;
     }
 
     const user = await this.usersService.create(registerDto);
@@ -358,7 +372,16 @@ export class AuthService {
   async updateProfile(
     userId: string,
     dto: UpdateProfileDto,
+    file?: Express.Multer.File,
   ): Promise<UserResponseDto> {
+    if (file) {
+      const uploadResult = await this.uploadService.uploadImage(
+        file,
+        'fixtree/profiles',
+      );
+      dto.profileImage = uploadResult.secureUrl;
+    }
+
     const user = await this.usersService.update(userId, dto);
     return this.toUserResponseDto(user);
   }

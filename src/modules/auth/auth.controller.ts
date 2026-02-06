@@ -6,7 +6,10 @@ import {
   Req,
   Get,
   Patch,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import type { Request } from 'express';
 import { AuthService } from './auth.service';
 import { Public } from '../../common/decorators/public.decorator';
@@ -34,6 +37,7 @@ import {
   VerifyEmailResponseDto,
   UserResponseDto,
 } from './dto/responses';
+import { imageUploadConfig } from '../../shared/upload/upload.config';
 
 @Controller('auth')
 export class AuthController {
@@ -41,8 +45,12 @@ export class AuthController {
 
   @Public()
   @Post('register')
-  register(@Body() registerDto: RegisterDto): Promise<RegisterResponseDto> {
-    return this.authService.register(registerDto);
+  @UseInterceptors(FileInterceptor('profileImage', imageUploadConfig))
+  register(
+    @Body() registerDto: RegisterDto,
+    @UploadedFile() file?: Express.Multer.File,
+  ): Promise<RegisterResponseDto> {
+    return this.authService.register(registerDto, file);
   }
 
   @Public()
@@ -78,7 +86,7 @@ export class AuthController {
   }
 
   @Public()
-  @Post('resend-email-verification')
+  @Post('email/resend-verification')
   resendEmailVerification(
     @Body() dto: ResendEmailVerificationDto,
   ): Promise<MessageResponseDto> {
@@ -86,13 +94,13 @@ export class AuthController {
   }
 
   @Public()
-  @Post('verify-email')
+  @Post('email/verify')
   verifyEmail(@Body() dto: VerifyEmailDto): Promise<VerifyEmailResponseDto> {
     return this.authService.verifyEmail(dto);
   }
 
   @Public()
-  @Post('resend-phone-verification')
+  @Post('phone/resend-verification')
   resendPhoneVerification(
     @Body() dto: ResendPhoneVerificationDto,
   ): Promise<MessageResponseDto> {
@@ -100,19 +108,28 @@ export class AuthController {
   }
 
   @Public()
-  @Post('verify-phone')
+  @Post('phone/verify')
   verifyPhone(@Body() dto: VerifyPhoneDto): Promise<MessageResponseDto> {
     return this.authService.verifyPhone(dto);
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Post('password/change')
+  changePassword(
+    @CurrentUser() user: JwtPayload,
+    @Body() dto: ChangePasswordDto,
+  ): Promise<MessageResponseDto> {
+    return this.authService.changePassword(user.sub, dto);
+  }
+
   @Public()
-  @Post('forgot-password')
+  @Post('password/forgot')
   forgotPassword(@Body() dto: ForgotPasswordDto): Promise<MessageResponseDto> {
     return this.authService.forgotPassword(dto);
   }
 
   @Public()
-  @Post('reset-password')
+  @Post('password/reset')
   resetPassword(@Body() dto: ResetPasswordDto): Promise<MessageResponseDto> {
     return this.authService.resetPassword(dto);
   }
@@ -124,15 +141,6 @@ export class AuthController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Post('change-password')
-  changePassword(
-    @CurrentUser() user: JwtPayload,
-    @Body() dto: ChangePasswordDto,
-  ): Promise<MessageResponseDto> {
-    return this.authService.changePassword(user.sub, dto);
-  }
-
-  @UseGuards(JwtAuthGuard)
   @Get('me')
   getMe(@CurrentUser() user: JwtPayload): Promise<UserResponseDto> {
     return this.authService.getMe(user.sub);
@@ -140,10 +148,12 @@ export class AuthController {
 
   @UseGuards(JwtAuthGuard)
   @Patch('profile')
+  @UseInterceptors(FileInterceptor('profileImage', imageUploadConfig))
   updateProfile(
     @CurrentUser() user: JwtPayload,
     @Body() dto: UpdateProfileDto,
+    @UploadedFile() file?: Express.Multer.File,
   ): Promise<UserResponseDto> {
-    return this.authService.updateProfile(user.sub, dto);
+    return this.authService.updateProfile(user.sub, dto, file);
   }
 }
