@@ -7,7 +7,7 @@ import {
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { DeviceInfoDto } from './device-info.dto';
-import { AtLeastOne } from '../../../common/validators/at-least-one.validator';
+import { AtLeastOne } from '../../../../common/validators/at-least-one.validator';
 
 export class LoginDto {
   @AtLeastOne(['email', 'phone'], {

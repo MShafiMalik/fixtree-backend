@@ -311,14 +311,22 @@ fixtree-backend/
         │   │   └── dto/
         │   │       └── session-response.dto.ts
         │   └── dto/
-        │       ├── login.dto.ts
-        │       ├── register.dto.ts
-        │       ├── change-password.dto.ts
-        │       ├── forgot-password.dto.ts
-        │       ├── reset-password.dto.ts
-        │       ├── refresh-token.dto.ts
-        │       ├── device-info.dto.ts
-        │       └── update-profile.dto.ts
+        │       ├── requests/                # Input DTOs (request payloads)
+        │       │   ├── login.dto.ts
+        │       │   ├── register.dto.ts
+        │       │   ├── google-login.dto.ts
+        │       │   ├── refresh-token.dto.ts
+        │       │   ├── change-password.dto.ts
+        │       │   ├── forgot-password.dto.ts
+        │       │   ├── reset-password.dto.ts
+        │       │   ├── update-profile.dto.ts
+        │       │   ├── verify-email.dto.ts
+        │       │   ├── verify-phone.dto.ts
+        │       │   ├── resend-email-verification.dto.ts
+        │       │   ├── resend-phone-verification.dto.ts
+        │       │   └── device-info.dto.ts
+        │       └── responses/               # Output DTOs (response payloads)
+        │           └── login-response.dto.ts
         │
         ├── users/
         │   ├── users.module.ts
@@ -780,8 +788,8 @@ import { Roles } from '../../common/decorators/roles.decorator';
 import { Public } from '../../common/decorators/public.decorator';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { Role } from '../../common/enums/role.enum';
-import { LoginDto } from './dto/login.dto';
-import { RegisterDto } from './dto/register.dto';
+import { LoginDto } from './dto/requests/login.dto';
+import { RegisterDto } from './dto/requests/register.dto';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -832,7 +840,7 @@ export class AuthController {
 ### Example: DTO with Validation
 
 ```typescript
-// src/modules/auth/dto/register.dto.ts
+// src/modules/auth/dto/requests/register.dto.ts
 import {
   IsEmail,
   IsString,

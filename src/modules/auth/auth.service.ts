@@ -16,21 +16,24 @@ import {
   JwtRefreshPayload,
 } from '../../common/types/jwt-payload.type';
 import { User } from '../users/entities/user.entity';
-import { GoogleLoginDto } from './dto/google-login.dto';
-import { RegisterDto } from './dto/register.dto';
-import { LoginDto } from './dto/login.dto';
 import { SessionsService } from './sessions/sessions.service';
-import { DeviceInfoDto } from './dto/device-info.dto';
 import { SendGridService } from '../../shared/sendgrid/sendgrid.service';
 import { TwilioService } from '../../shared/twilio/twilio.service';
-import { ResendEmailVerificationDto } from './dto/resend-email-verification.dto';
-import { VerifyEmailDto } from './dto/verify-email.dto';
-import { VerifyPhoneDto } from './dto/verify-phone.dto';
-import { ResendPhoneVerificationDto } from './dto/resend-phone-verification.dto';
-import { ForgotPasswordDto } from './dto/forgot-password.dto';
-import { ResetPasswordDto } from './dto/reset-password.dto';
-import { ChangePasswordDto } from './dto/change-password.dto';
-import { UpdateProfileDto } from './dto/update-profile.dto';
+import {
+  GoogleLoginDto,
+  RegisterDto,
+  LoginDto,
+  DeviceInfoDto,
+  ResendEmailVerificationDto,
+  VerifyEmailDto,
+  VerifyPhoneDto,
+  ResendPhoneVerificationDto,
+  ForgotPasswordDto,
+  ResetPasswordDto,
+  ChangePasswordDto,
+  UpdateProfileDto,
+} from './dto/requests';
+import { LoginResponseDto } from './dto/responses';
 
 @Injectable()
 export class AuthService {
@@ -92,6 +95,8 @@ export class AuthService {
         id: user.id,
         email: user.email,
         name: user.name,
+        phone: user.phone,
+        profileImage: user.profileImage,
         role: user.role,
       },
     };
@@ -104,7 +109,7 @@ export class AuthService {
       ipAddress?: string;
       userAgent?: string;
     },
-  ) {
+  ): Promise<LoginResponseDto> {
     if (!loginDto.email && !loginDto.phone) {
       throw new UnauthorizedException('Invalid credentials');
     }
@@ -153,7 +158,7 @@ export class AuthService {
       ipAddress?: string;
       userAgent?: string;
     },
-  ) {
+  ): Promise<LoginResponseDto> {
     const clientIds = this.configService.get<string[]>('google.clientIds');
     const clientId = this.configService.get<string>('google.clientId');
     const audiences = clientIds?.length
@@ -193,7 +198,7 @@ export class AuthService {
     return this.buildAuthResponse(user, tokens);
   }
 
-  async refreshTokens(refreshToken: string) {
+  async refreshTokens(refreshToken: string): Promise<LoginResponseDto> {
     const refreshSecret =
       this.configService.getOrThrow<string>('jwt.refreshSecret');
 
@@ -366,14 +371,16 @@ export class AuthService {
   private buildAuthResponse(
     user: User,
     tokens: { accessToken: string; refreshToken: string },
-  ) {
+  ): LoginResponseDto {
     return {
       accessToken: tokens.accessToken,
       refreshToken: tokens.refreshToken,
       user: {
         id: user.id,
-        email: user.email,
         name: user.name,
+        email: user.email,
+        phone: user.phone,
+        profileImage: user.profileImage,
         role: user.role,
       },
     };

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { APP_CONSTANTS } from '../constants/app.constants';
-import { PaginationDto } from '../dto/pagination.dto';
+import { PaginationDto } from '../dto/requests';
 
 @Injectable()
 export class UtilService {

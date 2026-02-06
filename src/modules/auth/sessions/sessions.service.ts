@@ -4,9 +4,9 @@ import { SessionsRepository } from './sessions.repository';
 import { DeviceParserService } from './device-parser.service';
 import { Platform } from '../../../common/enums/platform.enum';
 import { Session } from './entities/session.entity';
-import { SessionResponseDto } from './dto/session-response.dto';
+import { SessionResponseDto } from './dto/responses';
 import { APP_CONSTANTS } from '../../../common/constants/app.constants';
-import { DeviceInfoDto } from '../dto/device-info.dto';
+import { DeviceInfoDto } from '../dto/requests';
 import { REDIS_CLIENT } from '../../../shared/redis/redis.constants';
 
 @Injectable()

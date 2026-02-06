@@ -11,20 +11,23 @@ import type { Request } from 'express';
 import { AuthService } from './auth.service';
 import { Public } from '../../common/decorators/public.decorator';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
-import { RegisterDto } from './dto/register.dto';
-import { LoginDto } from './dto/login.dto';
-import { RefreshTokenDto } from './dto/refresh-token.dto';
-import { GoogleLoginDto } from './dto/google-login.dto';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import type { JwtPayload } from '../../common/types/jwt-payload.type';
-import { ResendEmailVerificationDto } from './dto/resend-email-verification.dto';
-import { VerifyEmailDto } from './dto/verify-email.dto';
-import { VerifyPhoneDto } from './dto/verify-phone.dto';
-import { ResendPhoneVerificationDto } from './dto/resend-phone-verification.dto';
-import { ForgotPasswordDto } from './dto/forgot-password.dto';
-import { ResetPasswordDto } from './dto/reset-password.dto';
-import { ChangePasswordDto } from './dto/change-password.dto';
-import { UpdateProfileDto } from './dto/update-profile.dto';
+import {
+  UpdateProfileDto,
+  RegisterDto,
+  LoginDto,
+  GoogleLoginDto,
+  RefreshTokenDto,
+  ResendEmailVerificationDto,
+  VerifyEmailDto,
+  VerifyPhoneDto,
+  ResendPhoneVerificationDto,
+  ForgotPasswordDto,
+  ResetPasswordDto,
+  ChangePasswordDto,
+} from './dto/requests';
+import { LoginResponseDto } from './dto/responses';
 
 @Controller('auth')
 export class AuthController {
@@ -38,7 +41,10 @@ export class AuthController {
 
   @Public()
   @Post('login')
-  login(@Body() loginDto: LoginDto, @Req() req: Request) {
+  login(
+    @Body() loginDto: LoginDto,
+    @Req() req: Request,
+  ): Promise<LoginResponseDto> {
     return this.authService.login(loginDto, {
       deviceInfo: loginDto.deviceInfo,
       ipAddress: req.ip,
@@ -48,7 +54,10 @@ export class AuthController {
 
   @Public()
   @Post('google')
-  googleLogin(@Body() googleLoginDto: GoogleLoginDto, @Req() req: Request) {
+  googleLogin(
+    @Body() googleLoginDto: GoogleLoginDto,
+    @Req() req: Request,
+  ): Promise<LoginResponseDto> {
     return this.authService.googleLogin(googleLoginDto, {
       deviceInfo: googleLoginDto.deviceInfo,
       ipAddress: req.ip,
@@ -58,7 +67,7 @@ export class AuthController {
 
   @Public()
   @Post('refresh')
-  refresh(@Body() refreshTokenDto: RefreshTokenDto) {
+  refresh(@Body() refreshTokenDto: RefreshTokenDto): Promise<LoginResponseDto> {
     return this.authService.refreshTokens(refreshTokenDto.refreshToken);
   }
 

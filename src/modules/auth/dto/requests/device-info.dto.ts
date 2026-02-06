@@ -1,5 +1,5 @@
 import { IsEnum, IsOptional, IsString } from 'class-validator';
-import { Platform } from '../../../common/enums/platform.enum';
+import { Platform } from '../../../../common/enums/platform.enum';
 
 export class DeviceInfoDto {
   @IsEnum(Platform)

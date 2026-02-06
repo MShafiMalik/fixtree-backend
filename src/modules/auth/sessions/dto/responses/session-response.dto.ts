@@ -1,8 +1,8 @@
-import { Platform } from '../../../../common/enums/platform.enum';
+import { Platform } from '../../../../../common/enums/platform.enum';
 
 export class SessionResponseDto {
   id: string;
-  platform: Platform;
+  platform: Platform | null;
   deviceId: string | null;
   deviceName: string | null;
   appVersion: string | null;
