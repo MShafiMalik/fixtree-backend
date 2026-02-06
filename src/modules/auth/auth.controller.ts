@@ -27,7 +27,13 @@ import {
   ResetPasswordDto,
   ChangePasswordDto,
 } from './dto/requests';
-import { LoginResponseDto } from './dto/responses';
+import {
+  LoginResponseDto,
+  RegisterResponseDto,
+  MessageResponseDto,
+  VerifyEmailResponseDto,
+  UserResponseDto,
+} from './dto/responses';
 
 @Controller('auth')
 export class AuthController {
@@ -35,7 +41,7 @@ export class AuthController {
 
   @Public()
   @Post('register')
-  register(@Body() registerDto: RegisterDto) {
+  register(@Body() registerDto: RegisterDto): Promise<RegisterResponseDto> {
     return this.authService.register(registerDto);
   }
 
@@ -73,43 +79,47 @@ export class AuthController {
 
   @Public()
   @Post('resend-email-verification')
-  resendEmailVerification(@Body() dto: ResendEmailVerificationDto) {
+  resendEmailVerification(
+    @Body() dto: ResendEmailVerificationDto,
+  ): Promise<MessageResponseDto> {
     return this.authService.resendEmailVerification(dto);
   }
 
   @Public()
   @Post('verify-email')
-  verifyEmail(@Body() dto: VerifyEmailDto) {
+  verifyEmail(@Body() dto: VerifyEmailDto): Promise<VerifyEmailResponseDto> {
     return this.authService.verifyEmail(dto);
   }
 
   @Public()
   @Post('resend-phone-verification')
-  resendPhoneVerification(@Body() dto: ResendPhoneVerificationDto) {
+  resendPhoneVerification(
+    @Body() dto: ResendPhoneVerificationDto,
+  ): Promise<MessageResponseDto> {
     return this.authService.resendPhoneVerification(dto);
   }
 
   @Public()
   @Post('verify-phone')
-  verifyPhone(@Body() dto: VerifyPhoneDto) {
+  verifyPhone(@Body() dto: VerifyPhoneDto): Promise<MessageResponseDto> {
     return this.authService.verifyPhone(dto);
   }
 
   @Public()
   @Post('forgot-password')
-  forgotPassword(@Body() dto: ForgotPasswordDto) {
+  forgotPassword(@Body() dto: ForgotPasswordDto): Promise<MessageResponseDto> {
     return this.authService.forgotPassword(dto);
   }
 
   @Public()
   @Post('reset-password')
-  resetPassword(@Body() dto: ResetPasswordDto) {
+  resetPassword(@Body() dto: ResetPasswordDto): Promise<MessageResponseDto> {
     return this.authService.resetPassword(dto);
   }
 
   @UseGuards(JwtAuthGuard)
   @Post('logout')
-  logout(@CurrentUser() user: JwtPayload) {
+  logout(@CurrentUser() user: JwtPayload): Promise<MessageResponseDto> {
     return this.authService.logout(user.sub, user.sessionId);
   }
 
@@ -118,13 +128,13 @@ export class AuthController {
   changePassword(
     @CurrentUser() user: JwtPayload,
     @Body() dto: ChangePasswordDto,
-  ) {
+  ): Promise<MessageResponseDto> {
     return this.authService.changePassword(user.sub, dto);
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('me')
-  getMe(@CurrentUser() user: JwtPayload) {
+  getMe(@CurrentUser() user: JwtPayload): Promise<UserResponseDto> {
     return this.authService.getMe(user.sub);
   }
 
@@ -133,7 +143,7 @@ export class AuthController {
   updateProfile(
     @CurrentUser() user: JwtPayload,
     @Body() dto: UpdateProfileDto,
-  ) {
+  ): Promise<UserResponseDto> {
     return this.authService.updateProfile(user.sub, dto);
   }
 }

@@ -5,6 +5,7 @@ import { DeviceParserService } from './device-parser.service';
 import { Platform } from '../../../common/enums/platform.enum';
 import { Session } from './entities/session.entity';
 import { SessionResponseDto } from './dto/responses';
+import { MessageResponseDto } from '../dto/responses';
 import { APP_CONSTANTS } from '../../../common/constants/app.constants';
 import { DeviceInfoDto } from '../dto/requests';
 import { REDIS_CLIENT } from '../../../shared/redis/redis.constants';
@@ -77,23 +78,32 @@ export class SessionsService {
     return session;
   }
 
-  async revokeSession(sessionId: string, userId: string): Promise<void> {
+  async revokeSession(
+    sessionId: string,
+    userId: string,
+  ): Promise<MessageResponseDto> {
     const session = await this.sessionsRepository.findById(sessionId);
     if (session?.userId !== userId) {
       throw new NotFoundException('Session not found');
     }
     await this.sessionsRepository.revoke(sessionId);
     await this.invalidateCache(userId);
+    return { message: 'Session revoked' };
   }
 
-  async revokeAll(userId: string): Promise<void> {
+  async revokeAll(userId: string): Promise<MessageResponseDto> {
     await this.sessionsRepository.revokeAll(userId);
     await this.invalidateCache(userId);
+    return { message: 'All sessions revoked' };
   }
 
-  async revokeOthers(userId: string, currentSessionId: string): Promise<void> {
+  async revokeOthers(
+    userId: string,
+    currentSessionId: string,
+  ): Promise<MessageResponseDto> {
     await this.sessionsRepository.revokeOthers(userId, currentSessionId);
     await this.invalidateCache(userId);
+    return { message: 'Other sessions revoked' };
   }
 
   async touch(sessionId: string): Promise<void> {

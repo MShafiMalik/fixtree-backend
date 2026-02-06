@@ -33,7 +33,13 @@ import {
   ChangePasswordDto,
   UpdateProfileDto,
 } from './dto/requests';
-import { LoginResponseDto } from './dto/responses';
+import {
+  LoginResponseDto,
+  RegisterResponseDto,
+  MessageResponseDto,
+  VerifyEmailResponseDto,
+  UserResponseDto,
+} from './dto/responses';
 
 @Injectable()
 export class AuthService {
@@ -58,7 +64,7 @@ export class AuthService {
     }
   }
 
-  async register(registerDto: RegisterDto) {
+  async register(registerDto: RegisterDto): Promise<RegisterResponseDto> {
     if (registerDto.email && registerDto.phone) {
       throw new BadRequestException('Provide either email or phone, not both');
     }
@@ -99,7 +105,7 @@ export class AuthService {
         profileImage: user.profileImage,
         role: user.role,
       },
-    };
+    } satisfies RegisterResponseDto;
   }
 
   async login(
@@ -221,12 +227,14 @@ export class AuthService {
     }
   }
 
-  async logout(userId: string, sessionId: string) {
+  async logout(userId: string, sessionId: string): Promise<MessageResponseDto> {
     await this.sessionsService.revokeSession(sessionId, userId);
     return { message: 'Logged out successfully' };
   }
 
-  async resendEmailVerification(dto: ResendEmailVerificationDto) {
+  async resendEmailVerification(
+    dto: ResendEmailVerificationDto,
+  ): Promise<MessageResponseDto> {
     const user = await this.usersService.findByEmail(dto.email);
     if (!user) {
       return { message: 'This email is not registered.' };
@@ -255,7 +263,7 @@ export class AuthService {
     return { message: 'Verification email sent.' };
   }
 
-  async verifyEmail(dto: VerifyEmailDto) {
+  async verifyEmail(dto: VerifyEmailDto): Promise<VerifyEmailResponseDto> {
     const user = await this.usersService.verifyEmail(dto.token);
     return {
       message: 'Email verified successfully.',
@@ -263,7 +271,9 @@ export class AuthService {
     };
   }
 
-  async resendPhoneVerification(dto: ResendPhoneVerificationDto) {
+  async resendPhoneVerification(
+    dto: ResendPhoneVerificationDto,
+  ): Promise<MessageResponseDto> {
     const user = await this.usersService.findByPhone(dto.phone);
     if (!user) {
       return { message: 'This phone number is not registered.' };
@@ -279,7 +289,7 @@ export class AuthService {
     return { message: 'Verification code sent.' };
   }
 
-  async verifyPhone(dto: VerifyPhoneDto) {
+  async verifyPhone(dto: VerifyPhoneDto): Promise<MessageResponseDto> {
     const user = await this.usersService.findByPhone(dto.phone);
     if (!user) {
       throw new UnauthorizedException('Invalid phone verification request');
@@ -294,7 +304,7 @@ export class AuthService {
     return { message: 'Phone verified successfully.' };
   }
 
-  async forgotPassword(dto: ForgotPasswordDto) {
+  async forgotPassword(dto: ForgotPasswordDto): Promise<MessageResponseDto> {
     const user = await this.usersService.findByEmail(dto.email);
     if (!user) {
       return { message: 'This email is not registered.' };
@@ -314,12 +324,15 @@ export class AuthService {
     return { message: 'Password reset instructions sent.' };
   }
 
-  async resetPassword(dto: ResetPasswordDto) {
+  async resetPassword(dto: ResetPasswordDto): Promise<MessageResponseDto> {
     await this.usersService.resetPassword(dto.token, dto.newPassword);
     return { message: 'Password reset successfully.' };
   }
 
-  async changePassword(userId: string, dto: ChangePasswordDto) {
+  async changePassword(
+    userId: string,
+    dto: ChangePasswordDto,
+  ): Promise<MessageResponseDto> {
     const user = await this.usersService.findById(userId);
     if (!user.password) {
       throw new UnauthorizedException('Password authentication not available');
@@ -337,12 +350,28 @@ export class AuthService {
     return { message: 'Password changed successfully.' };
   }
 
-  async getMe(userId: string) {
-    return this.usersService.findById(userId);
+  async getMe(userId: string): Promise<UserResponseDto> {
+    const user = await this.usersService.findById(userId);
+    return this.toUserResponseDto(user);
   }
 
-  async updateProfile(userId: string, dto: UpdateProfileDto) {
-    return this.usersService.update(userId, dto);
+  async updateProfile(
+    userId: string,
+    dto: UpdateProfileDto,
+  ): Promise<UserResponseDto> {
+    const user = await this.usersService.update(userId, dto);
+    return this.toUserResponseDto(user);
+  }
+
+  private toUserResponseDto(user: User): UserResponseDto {
+    return {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      phone: user.phone,
+      profileImage: user.profileImage,
+      role: user.role,
+    };
   }
 
   private async signTokens(user: User, sessionId: string) {
