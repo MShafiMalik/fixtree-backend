@@ -9,11 +9,13 @@ import { UsersModule } from '../users/users.module';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { JwtRefreshStrategy } from './strategies/jwt-refresh.strategy';
 import { SessionsModule } from './sessions/sessions.module';
+import { SellersModule } from '../sellers/sellers.module';
 
 @Module({
   imports: [
     UsersModule,
     SessionsModule,
+    SellersModule,
     PassportModule,
     JwtModule.registerAsync({
       inject: [ConfigService],

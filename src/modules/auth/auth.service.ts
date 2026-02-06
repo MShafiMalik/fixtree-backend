@@ -20,6 +20,8 @@ import { SessionsService } from './sessions/sessions.service';
 import { SendGridService } from '../../shared/sendgrid/sendgrid.service';
 import { TwilioService } from '../../shared/twilio/twilio.service';
 import { UploadService } from '../../shared/upload/upload.service';
+import { SellersService } from '../sellers/sellers.service';
+import { Role } from '../../common/enums/role.enum';
 import {
   GoogleLoginDto,
   RegisterDto,
@@ -55,6 +57,7 @@ export class AuthService {
     private readonly sendGridService: SendGridService,
     private readonly twilioService: TwilioService,
     private readonly uploadService: UploadService,
+    private readonly sellersService: SellersService,
   ) {
     const googleClientIds =
       this.configService.get<string[]>('google.clientIds');
@@ -84,6 +87,11 @@ export class AuthService {
     }
 
     const user = await this.usersService.create(registerDto);
+
+    // Auto-create seller if role is SELLER
+    if (user.role === Role.SELLER) {
+      await this.sellersService.create({ userId: user.id });
+    }
 
     if (user.email) {
       this.assertVerificationCooldown(user.emailVerificationSentAt);
@@ -206,6 +214,11 @@ export class AuthService {
       name: payload.name ?? payload.email,
       profileImage: payload.picture,
     });
+
+    // Auto-create seller if role is SELLER
+    if (user.role === Role.SELLER) {
+      await this.sellersService.create({ userId: user.id });
+    }
 
     const session = await this.sessionsService.createSession(
       user.id,
