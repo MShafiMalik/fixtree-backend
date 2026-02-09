@@ -11,6 +11,6 @@ import { RedisModule } from '../../../shared/redis/redis.module';
   imports: [TypeOrmModule.forFeature([Session]), RedisModule],
   providers: [SessionsRepository, SessionsService, DeviceParserService],
   controllers: [SessionsController],
-  exports: [SessionsService],
+  exports: [SessionsService, SessionsRepository],
 })
 export class SessionsModule {}

@@ -14,6 +14,7 @@ import { AdminModule } from './modules/admin/admin.module';
 import { RequestIdMiddleware } from './common/middleware/request-id.middleware';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { RolesGuard } from './common/guards/roles.guard';
+import { CronModule } from './queues/cron/cron.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { RolesGuard } from './common/guards/roles.guard';
     UsersModule,
     AuthModule,
     AdminModule,
+    CronModule,
   ],
   providers: [
     {

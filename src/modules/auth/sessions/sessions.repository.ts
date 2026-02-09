@@ -48,4 +48,34 @@ export class SessionsRepository {
       .andWhere('id != :currentSessionId', { currentSessionId })
       .execute();
   }
+
+  async cleanupExpiredSessions(cutoffDate: Date): Promise<{
+    revoked: number;
+    expired: number;
+  }> {
+    // Run both delete operations in parallel for better performance
+    const [revokedResult, expiredResult] = await Promise.all([
+      // Delete revoked sessions older than cutoff date
+      this.repository
+        .createQueryBuilder()
+        .delete()
+        .from(Session)
+        .where('is_revoked = :isRevoked', { isRevoked: true })
+        .andWhere('updated_at < :cutoffDate', { cutoffDate })
+        .execute(),
+      // Delete expired sessions (if expiresAt is set and in the past)
+      this.repository
+        .createQueryBuilder()
+        .delete()
+        .from(Session)
+        .where('expires_at IS NOT NULL')
+        .andWhere('expires_at < :now', { now: new Date() })
+        .execute(),
+    ]);
+
+    return {
+      revoked: revokedResult.affected ?? 0,
+      expired: expiredResult.affected ?? 0,
+    };
+  }
 }
