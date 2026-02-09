@@ -5,15 +5,7 @@ import {
   UploadApiResponse,
   UploadApiErrorResponse,
 } from 'cloudinary';
-
-export interface CloudinaryUploadResult {
-  publicId: string;
-  url: string;
-  secureUrl: string;
-  format: string;
-  width: number;
-  height: number;
-}
+import { CloudinaryUploadResultDto } from './dto/cloudinary-upload-result.dto';
 
 @Injectable()
 export class CloudinaryService {
@@ -28,7 +20,7 @@ export class CloudinaryService {
   async uploadImage(
     file: Express.Multer.File,
     folder: string = 'fixtree',
-  ): Promise<CloudinaryUploadResult> {
+  ): Promise<CloudinaryUploadResultDto> {
     return new Promise((resolve, reject) => {
       cloudinary.uploader
         .upload_stream(
@@ -44,14 +36,15 @@ export class CloudinaryService {
               reject(new Error(error?.message ?? 'Upload failed'));
               return;
             }
-            resolve({
+            const uploadResult: CloudinaryUploadResultDto = {
               publicId: result.public_id,
               url: result.url,
               secureUrl: result.secure_url,
               format: result.format,
               width: result.width,
               height: result.height,
-            });
+            };
+            resolve(uploadResult);
           },
         )
         .end(file.buffer);
@@ -61,13 +54,13 @@ export class CloudinaryService {
   async uploadImageFromUrl(
     url: string,
     folder: string = 'fixtree',
-  ): Promise<CloudinaryUploadResult> {
+  ): Promise<CloudinaryUploadResultDto> {
     const result = await cloudinary.uploader.upload(url, {
       folder,
       resource_type: 'image',
     });
 
-    return {
+    const uploadResult: CloudinaryUploadResultDto = {
       publicId: result.public_id,
       url: result.url,
       secureUrl: result.secure_url,
@@ -75,6 +68,7 @@ export class CloudinaryService {
       width: result.width,
       height: result.height,
     };
+    return uploadResult;
   }
 
   async deleteImage(publicId: string): Promise<boolean> {

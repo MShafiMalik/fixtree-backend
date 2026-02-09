@@ -1,8 +1,6 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
-import {
-  CloudinaryService,
-  CloudinaryUploadResult,
-} from '../cloudinary/cloudinary.service';
+import { CloudinaryService } from '../cloudinary/cloudinary.service';
+import { CloudinaryUploadResultDto } from '../cloudinary/dto/cloudinary-upload-result.dto';
 import { LoggerService } from '../logger/logger.service';
 import { ALLOWED_IMAGE_TYPES, MAX_FILE_SIZE } from './upload.config';
 
@@ -16,7 +14,7 @@ export class UploadService {
   async uploadImage(
     file: Express.Multer.File,
     folder: string = 'fixtree',
-  ): Promise<CloudinaryUploadResult> {
+  ): Promise<CloudinaryUploadResultDto> {
     this.validateFile(file);
 
     try {
@@ -36,7 +34,7 @@ export class UploadService {
   async uploadMultipleImages(
     files: Express.Multer.File[],
     folder: string = 'fixtree',
-  ): Promise<CloudinaryUploadResult[]> {
+  ): Promise<CloudinaryUploadResultDto[]> {
     const uploadPromises = files.map((file) => this.uploadImage(file, folder));
     return Promise.all(uploadPromises);
   }
