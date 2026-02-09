@@ -2,15 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import sgMail, { MailDataRequired } from '@sendgrid/mail';
 import { LoggerService } from '../logger/logger.service';
-
-export interface SendEmailOptions {
-  to: string;
-  subject: string;
-  text?: string;
-  html?: string;
-  templateId?: string;
-  dynamicTemplateData?: Record<string, unknown>;
-}
+import { SendEmailDto } from './dto/send-email.dto';
 
 @Injectable()
 export class SendGridService {
@@ -32,7 +24,7 @@ export class SendGridService {
       this.configService.get<string>('sendgrid.fromName') ?? 'Fixtree';
   }
 
-  async sendEmail(options: SendEmailOptions): Promise<void> {
+  async sendEmail(options: SendEmailDto): Promise<void> {
     try {
       const text = options.text?.trim() ?? '';
       const html = options.html?.trim() ?? '';
