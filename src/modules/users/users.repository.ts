@@ -58,6 +58,11 @@ export class UsersRepository {
     page?: number;
     limit?: number;
     includeDeleted?: boolean;
+    search?: string;
+    role?: string;
+    isActive?: boolean;
+    isEmailVerified?: boolean;
+    isPhoneVerified?: boolean;
   }): Promise<{ users: User[]; total: number }> {
     const page = options?.page ?? 1;
     const limit = options?.limit ?? 10;
@@ -67,6 +72,36 @@ export class UsersRepository {
 
     if (options?.includeDeleted) {
       queryBuilder.withDeleted();
+    }
+
+    // Apply filters
+    if (options?.search) {
+      queryBuilder.andWhere(
+        '(user.name ILIKE :search OR user.email ILIKE :search OR user.phone ILIKE :search)',
+        { search: `%${options.search}%` },
+      );
+    }
+
+    if (options?.role) {
+      queryBuilder.andWhere('user.role = :role', { role: options.role });
+    }
+
+    if (options?.isActive !== undefined) {
+      queryBuilder.andWhere('user.isActive = :isActive', {
+        isActive: options.isActive,
+      });
+    }
+
+    if (options?.isEmailVerified !== undefined) {
+      queryBuilder.andWhere('user.isEmailVerified = :isEmailVerified', {
+        isEmailVerified: options.isEmailVerified,
+      });
+    }
+
+    if (options?.isPhoneVerified !== undefined) {
+      queryBuilder.andWhere('user.isPhoneVerified = :isPhoneVerified', {
+        isPhoneVerified: options.isPhoneVerified,
+      });
     }
 
     const [users, total] = await queryBuilder

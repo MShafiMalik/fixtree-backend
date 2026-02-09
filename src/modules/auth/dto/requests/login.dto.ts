@@ -10,9 +10,6 @@ import { DeviceInfoDto } from './device-info.dto';
 import { AtLeastOne } from '../../../../common/validators/at-least-one.validator';
 
 export class LoginDto {
-  @AtLeastOne(['email', 'phone'], {
-    message: 'Either email or phone is required',
-  })
   @IsEmail()
   @IsOptional()
   email?: string;
@@ -21,6 +18,9 @@ export class LoginDto {
   @IsOptional()
   phone?: string;
 
+  @AtLeastOne(['email', 'phone'], {
+    message: 'Either email or phone is required',
+  })
   @IsString()
   @MinLength(8)
   password: string;

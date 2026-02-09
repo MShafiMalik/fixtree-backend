@@ -671,6 +671,49 @@ src/modules/admin/
     └── admin-users.service.ts
 ```
 
+**Endpoints:**
+
+### Admin Authentication (`/admin/auth/*`)
+
+```
+POST   /admin/auth/login                # Admin login (ADMIN/SUPER_ADMIN only)
+POST   /admin/auth/refresh-token        # Refresh token
+POST   /admin/auth/logout               # Logout
+POST   /admin/auth/password/change      # Change password
+POST   /admin/auth/password/forgot      # Forgot password
+POST   /admin/auth/password/reset       # Reset password
+
+GET    /admin/auth/me                   # Get admin profile
+PATCH  /admin/auth/profile              # Update profile
+
+GET    /admin/auth/sessions             # List sessions
+DELETE /admin/auth/sessions/:id         # Logout device
+DELETE /admin/auth/sessions             # Logout all
+DELETE /admin/auth/sessions/others      # Logout others
+```
+
+### Admin User Management (`/admin/users/*`)
+
+```
+GET    /admin/users                     # List all users
+POST   /admin/users                     # Create user (Super Admin)
+GET    /admin/users/:id                 # Get user details
+PATCH  /admin/users/:id                 # Update user
+DELETE /admin/users/:id                 # Delete user
+POST   /admin/users/:id/ban             # Ban user
+POST   /admin/users/:id/unban           # Unban user
+```
+
+**Dependencies:**
+
+No new dependencies required. Uses existing:
+
+- `@nestjs/jwt` (already installed)
+- `@nestjs/passport` (already installed)
+- `passport-jwt` (already installed)
+- `class-validator` (already installed)
+- `class-transformer` (already installed)
+
 ---
 
 ## Stage 11: Queue & Cron Jobs
@@ -1079,8 +1122,16 @@ sudo apt install nginx -y
 ### Admin Auth Flow
 
 - [ ] POST /admin/auth/login - Admin login
-- [ ] GET /admin/auth/profile - Admin profile
+- [ ] POST /admin/auth/password/change - Change password
+- [ ] POST /admin/auth/password/forgot - Forgot password
+- [ ] POST /admin/auth/password/reset - Reset password
+- [ ] GET /admin/auth/me - Admin profile
+- [ ] PATCH /admin/auth/profile - Update profile
 - [ ] GET /admin/auth/sessions - Admin sessions
+- [ ] DELETE /admin/auth/sessions/:id - Logout device
+- [ ] DELETE /admin/auth/sessions - Logout all
+- [ ] DELETE /admin/auth/sessions/others - Logout others
+- [ ] POST /admin/auth/logout - Logout current
 
 ### Admin User Management
 

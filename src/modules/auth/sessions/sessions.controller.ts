@@ -1,13 +1,11 @@
-import { Controller, Get, Delete, UseGuards, Param } from '@nestjs/common';
+import { Controller, Get, Delete, Param } from '@nestjs/common';
 import { SessionsService } from './sessions.service';
-import { JwtAuthGuard } from '../../../common/guards/jwt-auth.guard';
 import { CurrentUser } from '../../../common/decorators/current-user.decorator';
 import type { JwtPayload } from '../../../common/types/jwt-payload.type';
 import { SessionResponseDto } from './dto/responses';
 import { MessageResponseDto } from '../dto/responses';
 
 @Controller('auth/sessions')
-@UseGuards(JwtAuthGuard)
 export class SessionsController {
   constructor(private readonly sessionsService: SessionsService) {}
 

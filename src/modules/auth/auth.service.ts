@@ -119,14 +119,7 @@ export class AuthService {
     return {
       message: `Registration successful. Please verify your ${user.email ? 'email' : 'phone'} to log in.`,
       verificationRequired: true,
-      user: {
-        id: user.id,
-        email: user.email,
-        name: user.name,
-        phone: user.phone,
-        profileImage: user.profileImage,
-        role: user.role,
-      },
+      user: this.toUserResponseDto(user),
     } satisfies RegisterResponseDto;
   }
 
@@ -160,6 +153,12 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
+    if (user.role !== Role.BUYER && user.role !== Role.SELLER) {
+      throw new UnauthorizedException(
+        'Access denied. Only BUYER and SELLER roles are allowed.',
+      );
+    }
+
     if (loginChannel === 'email' && !user.isEmailVerified) {
       throw new UnauthorizedException('Please verify your email before login');
     }
@@ -168,6 +167,21 @@ export class AuthService {
       throw new UnauthorizedException('Please verify your phone before login');
     }
 
+    return this.performLogin(user, context);
+  }
+
+  /**
+   * Core login logic without role/verification checks
+   * Used by both regular auth and admin auth
+   */
+  async performLogin(
+    user: User,
+    context?: {
+      deviceInfo?: DeviceInfoDto;
+      ipAddress?: string;
+      userAgent?: string;
+    },
+  ): Promise<LoginResponseDto> {
     const session = await this.sessionsService.createSession(
       user.id,
       context?.deviceInfo,
@@ -334,7 +348,7 @@ export class AuthService {
   async forgotPassword(dto: ForgotPasswordDto): Promise<MessageResponseDto> {
     const user = await this.usersService.findByEmail(dto.email);
     if (!user) {
-      return { message: 'This email is not registered.' };
+      throw new UnauthorizedException('This email is not registered.');
     }
 
     const token = this.utilService.generateRandomString(48);
@@ -407,10 +421,18 @@ export class AuthService {
       phone: user.phone,
       profileImage: user.profileImage,
       role: user.role,
-    };
+      country: user.country,
+      state: user.state,
+      city: user.city,
+      postalCode: user.postalCode,
+      address: user.address,
+    } satisfies UserResponseDto;
   }
 
-  private async signTokens(user: User, sessionId: string) {
+  async signTokens(
+    user: User,
+    sessionId: string,
+  ): Promise<{ accessToken: string; refreshToken: string }> {
     const payload: JwtPayload = {
       sub: user.id,
       email: user.email,
@@ -430,25 +452,21 @@ export class AuthService {
       ),
     ]);
 
-    return { accessToken, refreshToken };
+    return { accessToken, refreshToken } satisfies {
+      accessToken: string;
+      refreshToken: string;
+    };
   }
 
-  private buildAuthResponse(
+  buildAuthResponse(
     user: User,
     tokens: { accessToken: string; refreshToken: string },
   ): LoginResponseDto {
     return {
       accessToken: tokens.accessToken,
       refreshToken: tokens.refreshToken,
-      user: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        phone: user.phone,
-        profileImage: user.profileImage,
-        role: user.role,
-      },
-    };
+      user: this.toUserResponseDto(user),
+    } satisfies LoginResponseDto;
   }
 
   private assertVerificationCooldown(sentAt: Date | null) {

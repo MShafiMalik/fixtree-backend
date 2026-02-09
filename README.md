@@ -416,11 +416,11 @@ DELETE /auth/sessions/others               # Logout other devices
 POST   /admin/auth/login                # Admin login
 POST   /admin/auth/refresh-token        # Refresh token
 POST   /admin/auth/logout               # Logout
-POST   /admin/auth/change-password      # Change password
-POST   /admin/auth/forgot-password      # Forgot password
-POST   /admin/auth/reset-password       # Reset password
+POST   /admin/auth/password/change      # Change password
+POST   /admin/auth/password/forgot      # Forgot password
+POST   /admin/auth/password/reset       # Reset password
 
-GET    /admin/auth/profile              # Get admin profile
+GET    /admin/auth/me                   # Get admin profile
 PATCH  /admin/auth/profile              # Update profile
 
 GET    /admin/auth/sessions             # List sessions

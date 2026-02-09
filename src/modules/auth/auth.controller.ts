@@ -2,7 +2,6 @@ import {
   Controller,
   Post,
   Body,
-  UseGuards,
   Req,
   Get,
   Patch,
@@ -13,7 +12,6 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import type { Request } from 'express';
 import { AuthService } from './auth.service';
 import { Public } from '../../common/decorators/public.decorator';
-import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import type { JwtPayload } from '../../common/types/jwt-payload.type';
 import {
@@ -113,7 +111,6 @@ export class AuthController {
     return this.authService.verifyPhone(dto);
   }
 
-  @UseGuards(JwtAuthGuard)
   @Post('password/change')
   changePassword(
     @CurrentUser() user: JwtPayload,
@@ -134,19 +131,16 @@ export class AuthController {
     return this.authService.resetPassword(dto);
   }
 
-  @UseGuards(JwtAuthGuard)
   @Post('logout')
   logout(@CurrentUser() user: JwtPayload): Promise<MessageResponseDto> {
     return this.authService.logout(user.sub, user.sessionId);
   }
 
-  @UseGuards(JwtAuthGuard)
   @Get('me')
   getMe(@CurrentUser() user: JwtPayload): Promise<UserResponseDto> {
     return this.authService.getMe(user.sub);
   }
 
-  @UseGuards(JwtAuthGuard)
   @Patch('profile')
   @UseInterceptors(FileInterceptor('profileImage', imageUploadConfig))
   updateProfile(

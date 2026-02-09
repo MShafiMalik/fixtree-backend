@@ -7,4 +7,9 @@ export class UserResponseDto {
   phone: string | null;
   profileImage: string | null;
   role: Role;
+  country: string | null;
+  state: string | null;
+  city: string | null;
+  postalCode: string | null;
+  address: string | null;
 }
