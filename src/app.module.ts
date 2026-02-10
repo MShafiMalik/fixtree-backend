@@ -12,6 +12,7 @@ import { UsersModule } from './modules/users/users.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { AdminModule } from './modules/admin/admin.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
+import { HealthModule } from './modules/health/health.module';
 import { RequestIdMiddleware } from './common/middleware/request-id.middleware';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { RolesGuard } from './common/guards/roles.guard';
@@ -31,6 +32,7 @@ import { CronModule } from './queues/cron/cron.module';
     AuthModule,
     AdminModule,
     NotificationsModule,
+    HealthModule,
     CronModule,
   ],
   providers: [
