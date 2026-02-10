@@ -16,6 +16,7 @@ import {
   UserResponseDto,
 } from '../../auth/dto/responses';
 import { DeviceInfoDto } from '../../auth/dto/requests';
+import { UploadService } from '../../../shared/upload/upload.service';
 
 @Injectable()
 export class AdminAuthService {
@@ -23,6 +24,7 @@ export class AdminAuthService {
     private readonly usersService: UsersService,
     private readonly authService: AuthService,
     private readonly utilService: UtilService,
+    private readonly uploadService: UploadService,
   ) {}
 
   async login(
@@ -105,6 +107,15 @@ export class AdminAuthService {
     dto: UpdateProfileDto,
     file?: Express.Multer.File,
   ): Promise<UserResponseDto> {
+    if (dto.profileImageUrl && !file) {
+      dto.profileImage = dto.profileImageUrl;
+    } else if (file) {
+      const uploadResult = await this.uploadService.uploadImage(
+        file,
+        'fixtree/profiles',
+      );
+      dto.profileImage = uploadResult.secureUrl;
+    }
     return this.authService.updateProfile(userId, dto, file);
   }
 }

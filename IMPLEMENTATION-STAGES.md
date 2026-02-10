@@ -18,15 +18,16 @@ Each stage is a separate commit. Complete one stage before moving to the next.
 | 6     | Auth Module (Basic)           | ✅ Completed |
 | 7     | Sessions Module               | ✅ Completed |
 | 8     | Auth Module (Extended)        | ✅ Completed |
-| 9     | Seller Module                 | ⬜ Pending   |
-| 10    | Admin Modules                 | ⬜ Pending   |
-| 11    | Queue & Cron Jobs             | ⬜ Pending   |
-| 12    | Notifications Module          | ⬜ Pending   |
-| 13    | Health Check & Swagger        | ⬜ Pending   |
-| 14    | Database Seeders              | ✅ Completed |
-| 15    | Docker Setup                  | ⬜ Pending   |
-| 16    | CI/CD Pipeline                | ⬜ Pending   |
-| 17    | Final Integration & Testing   | ⬜ Pending   |
+| 9     | Seller Module                 | ✅ Completed |
+| 10    | Admin Modules                 | ✅ Completed |
+| 11    | Queue & Cron Jobs             | ✅ Completed |
+| 12    | Notifications Module          | ✅ Completed |
+| 13    | Swagger Documentation         | ✅ Completed |
+| 14    | Health Check Module           | ⬜ Pending   |
+| 15    | Database Seeders              | ✅ Completed |
+| 16    | Docker Setup                  | ⬜ Pending   |
+| 17    | CI/CD Pipeline                | ⬜ Pending   |
+| 18    | Final Integration & Testing   | ⬜ Pending   |
 
 **Legend:** ⬜ Pending | 🔄 In Progress | ✅ Completed
 
@@ -778,16 +779,44 @@ src/modules/notifications/
 
 ---
 
-## Stage 13: Health Check & Swagger
+## Stage 13: Swagger Documentation
 
-**Commit:** `feat: health check and swagger documentation`
+**Commit:** `feat: swagger API documentation`
+
+**Tasks:**
+
+- [x] Configure Swagger in main.ts
+- [x] Add Swagger decorators to all controllers
+- [x] Add API tags, operations, and response decorators
+- [x] Configure authentication (Bearer token) in Swagger
+- [x] Test all endpoints via Swagger UI
+
+**Dependencies to install:**
+
+```bash
+npm install @nestjs/swagger
+```
+
+**Swagger Configuration:**
+
+- Swagger UI will be available at `/api/docs`
+- Bearer token authentication support
+- Auto-generated schemas from DTOs
+- Interactive API testing interface
+
+---
+
+## Stage 14: Health Check Module
+
+**Commit:** `feat: health check module`
 
 **Tasks:**
 
 - [ ] Create health module and controller
-- [ ] Configure Swagger in main.ts
-- [ ] Add Swagger decorators to all controllers
-- [ ] Test all endpoints via Swagger UI
+- [ ] Configure health checks for database (PostgreSQL)
+- [ ] Configure health checks for Redis
+- [ ] Add memory and disk health checks (optional)
+- [ ] Test health check endpoint
 
 **Files to create:**
 
@@ -800,12 +829,20 @@ src/modules/health/
 **Dependencies to install:**
 
 ```bash
-npm install @nestjs/swagger @nestjs/terminus
+npm install @nestjs/terminus
+```
+
+**Health Check Endpoints:**
+
+```
+GET /api/health          # Overall health status
+GET /api/health/db       # Database health
+GET /api/health/redis    # Redis health
 ```
 
 ---
 
-## Stage 14: Database Seeders
+## Stage 15: Database Seeders
 
 **Commit:** `feat: database seeders for initial data`
 
@@ -824,7 +861,7 @@ npm run seed
 
 ---
 
-## Stage 15: Docker Setup
+## Stage 16: Docker Setup
 
 **Commit:** `chore: docker configuration for development and production`
 
@@ -925,7 +962,7 @@ docker run -p 3000:3000 fixtree-backend
 
 ---
 
-## Stage 16: CI/CD Pipeline
+## Stage 17: CI/CD Pipeline
 
 **Commit:** `ci: github actions for CI/CD pipeline`
 
@@ -1076,7 +1113,7 @@ sudo apt install nginx -y
 
 ---
 
-## Stage 17: Final Integration & Testing
+## Stage 18: Final Integration & Testing
 
 **Commit:** `feat: final integration and manual testing`
 

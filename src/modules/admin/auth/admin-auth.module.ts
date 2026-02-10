@@ -9,6 +9,7 @@ import { AuthModule } from '../../auth/auth.module';
 import { UsersModule } from '../../users/users.module';
 import { UtilModule } from '../../../common/util/util.module';
 import { SessionsModule } from '../../auth/sessions/sessions.module';
+import { UploadModule } from '../../../shared/upload/upload.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { SessionsModule } from '../../auth/sessions/sessions.module';
     UtilModule,
     PassportModule,
     SessionsModule,
+    UploadModule,
     JwtModule.registerAsync({
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({

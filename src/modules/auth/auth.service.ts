@@ -78,7 +78,9 @@ export class AuthService {
     }
 
     // Upload profile image to Cloudinary if file is provided
-    if (file) {
+    if (registerDto.profileImageUrl && !file) {
+      registerDto.profileImage = registerDto.profileImageUrl;
+    } else if (file) {
       const uploadResult = await this.uploadService.uploadImage(
         file,
         'fixtree/profiles',
@@ -401,7 +403,9 @@ export class AuthService {
     dto: UpdateProfileDto,
     file?: Express.Multer.File,
   ): Promise<UserResponseDto> {
-    if (file) {
+    if (dto.profileImageUrl && !file) {
+      dto.profileImage = dto.profileImageUrl;
+    } else if (file) {
       const uploadResult = await this.uploadService.uploadImage(
         file,
         'fixtree/profiles',
