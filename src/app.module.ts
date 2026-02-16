@@ -17,10 +17,12 @@ import { RequestIdMiddleware } from './common/middleware/request-id.middleware';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { RolesGuard } from './common/guards/roles.guard';
 import { CronModule } from './queues/cron/cron.module';
+import { WebSocketModule } from './shared/websocket/websocket.module';
 
 @Module({
   imports: [
     AppConfigModule,
+    WebSocketModule,
     DatabaseModule,
     UtilModule,
     LoggerModule,
