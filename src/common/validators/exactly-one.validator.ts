@@ -4,13 +4,16 @@ import {
   ValidationArguments,
 } from 'class-validator';
 
-export function AtLeastOne(
+/**
+ * Validates that exactly one of the given properties has a value (not undefined, null, or empty string).
+ */
+export function ExactlyOne(
   propertyNames: string[],
   validationOptions?: ValidationOptions,
 ) {
   return (object: object, propertyName: string) => {
     registerDecorator({
-      name: 'atLeastOne',
+      name: 'exactlyOne',
       target: object.constructor,
       propertyName,
       constraints: [propertyNames],
@@ -19,10 +22,11 @@ export function AtLeastOne(
         validate(_value: unknown, args: ValidationArguments) {
           const [properties] = args.constraints as [string[]];
           const obj = args.object as Record<string, unknown>;
-          return properties.some((property) => {
-            const value = obj[property];
+          const count = properties.filter((prop) => {
+            const value = obj[prop];
             return value !== undefined && value !== null && value !== '';
-          });
+          }).length;
+          return count === 1;
         },
       },
     });
