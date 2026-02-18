@@ -48,32 +48,32 @@ A scalable, production-ready NestJS backend for the Fixtree physical service mar
 
 ## Tech Stack
 
-| Category | Technology | Version |
-|----------|------------|---------|
-| **Framework** | NestJS | ^11.x |
-| **Language** | TypeScript | ^5.x |
-| **Database** | PostgreSQL | ^16.x |
-| **ORM** | TypeORM | ^0.3.x |
-| **Cache/Queue** | Redis | ^7.x |
-| **Job Queue** | BullMQ | ^5.x |
-| **Authentication** | Passport + JWT | ^0.7.x |
-| **Google OAuth** | google-auth-library | ^9.x |
-| **Validation** | class-validator | ^0.14.x |
-| **File Upload** | Cloudinary | ^2.x |
-| **Email** | SendGrid | ^8.x |
-| **SMS** | Twilio | ^5.x |
-| **API Docs** | Swagger | ^8.x |
-| **Logging** | Winston | ^3.x |
-| **Security** | Helmet | ^8.x |
-| **User Agent** | Bowser | ^2.x |
-| **Code Formatter** | Prettier | ^3.x |
-| **Linter** | ESLint | ^9.x |
-| **Git Hooks** | Husky | ^9.x |
-| **Staged Linting** | lint-staged | ^15.x |
-| **Commit Linting** | commitlint | ^19.x |
-| **Env Validation** | Joi | ^17.x |
-| **Containerization** | Docker | ^24.x |
-| **CI/CD** | GitHub Actions | - |
+| Category             | Technology          | Version |
+| -------------------- | ------------------- | ------- |
+| **Framework**        | NestJS              | ^11.x   |
+| **Language**         | TypeScript          | ^5.x    |
+| **Database**         | PostgreSQL          | ^16.x   |
+| **ORM**              | TypeORM             | ^0.3.x  |
+| **Cache/Queue**      | Redis               | ^7.x    |
+| **Job Queue**        | BullMQ              | ^5.x    |
+| **Authentication**   | Passport + JWT      | ^0.7.x  |
+| **Google OAuth**     | google-auth-library | ^9.x    |
+| **Validation**       | class-validator     | ^0.14.x |
+| **File Upload**      | Cloudinary          | ^2.x    |
+| **Email**            | SendGrid            | ^8.x    |
+| **SMS**              | Twilio              | ^5.x    |
+| **API Docs**         | Swagger             | ^8.x    |
+| **Logging**          | Winston             | ^3.x    |
+| **Security**         | Helmet              | ^8.x    |
+| **User Agent**       | Bowser              | ^2.x    |
+| **Code Formatter**   | Prettier            | ^3.x    |
+| **Linter**           | ESLint              | ^9.x    |
+| **Git Hooks**        | Husky               | ^9.x    |
+| **Staged Linting**   | lint-staged         | ^15.x   |
+| **Commit Linting**   | commitlint          | ^19.x   |
+| **Env Validation**   | Joi                 | ^17.x   |
+| **Containerization** | Docker              | ^24.x   |
+| **CI/CD**            | GitHub Actions      | -       |
 
 ---
 
@@ -311,14 +311,22 @@ fixtree-backend/
         │   │   └── dto/
         │   │       └── session-response.dto.ts
         │   └── dto/
-        │       ├── login.dto.ts
-        │       ├── register.dto.ts
-        │       ├── change-password.dto.ts
-        │       ├── forgot-password.dto.ts
-        │       ├── reset-password.dto.ts
-        │       ├── refresh-token.dto.ts
-        │       ├── device-info.dto.ts
-        │       └── update-profile.dto.ts
+        │       ├── requests/                # Input DTOs (request payloads)
+        │       │   ├── login.dto.ts
+        │       │   ├── register.dto.ts
+        │       │   ├── google-login.dto.ts
+        │       │   ├── refresh-token.dto.ts
+        │       │   ├── change-password.dto.ts
+        │       │   ├── forgot-password.dto.ts
+        │       │   ├── reset-password.dto.ts
+        │       │   ├── update-profile.dto.ts
+        │       │   ├── verify-email.dto.ts
+        │       │   ├── verify-phone.dto.ts
+        │       │   ├── resend-email-verification.dto.ts
+        │       │   ├── resend-phone-verification.dto.ts
+        │       │   └── device-info.dto.ts
+        │       └── responses/               # Output DTOs (response payloads)
+        │           └── login-response.dto.ts
         │
         ├── users/
         │   ├── users.module.ts
@@ -354,12 +362,12 @@ fixtree-backend/
 
 ## User Roles
 
-| Role | Description | Registration | Permissions |
-|------|-------------|--------------|-------------|
-| **BUYER** | Service consumer | Public `/auth/register` | Browse, book, review services |
-| **SELLER** | Service provider | Public `/auth/register` | Create services, manage bookings |
-| **ADMIN** | Platform manager | Created by Super Admin | Manage users, moderate content |
-| **SUPER_ADMIN** | System owner | Database seeder | Full access, create admins |
+| Role            | Description      | Registration            | Permissions                      |
+| --------------- | ---------------- | ----------------------- | -------------------------------- |
+| **BUYER**       | Service consumer | Public `/auth/register` | Browse, book, review services    |
+| **SELLER**      | Service provider | Public `/auth/register` | Create services, manage bookings |
+| **ADMIN**       | Platform manager | Created by Super Admin  | Manage users, moderate content   |
+| **SUPER_ADMIN** | System owner     | Database seeder         | Full access, create admins       |
 
 ---
 
@@ -371,29 +379,35 @@ fixtree-backend/
 GET    /health                          # System health status
 ```
 
+### Auth Flow (Strict Verification)
+
+- Users must **verify email or phone** before login is allowed.
+- Registration sends a verification link/OTP.
+- Login is blocked until `isEmailVerified` or `isPhoneVerified` is true.
+
 ### Auth - User (Buyer/Seller)
 
 ```
-POST   /auth/register                   # Register new user
-POST   /auth/login                      # Login, get tokens
-POST   /auth/google                     # Google OAuth login
-POST   /auth/refresh-token              # Refresh access token
-POST   /auth/logout                     # Logout current device
-POST   /auth/change-password            # Change password
-POST   /auth/forgot-password            # Request password reset
-POST   /auth/reset-password             # Reset with token
-POST   /auth/verify-email               # Verify email address
-POST   /auth/send-phone-verification   # Send phone verification OTP
-POST   /auth/verify-phone              # Verify phone OTP
+POST   /auth/register                      # Register new user
+POST   /auth/login                         # Login (requires email/phone verification)
+POST   /auth/google                        # Google OAuth login
+POST   /auth/refresh                       # Refresh access token
+POST   /auth/logout                        # Logout current device
+POST   /auth/password/change               # Change password
+POST   /auth/password/forgot               # Request password reset
+POST   /auth/password/reset                # Reset with token
+POST   /auth/email/resend-verification     # Resend email verification
+POST   /auth/email/verify                  # Verify email address
+POST   /auth/phone/resend-verification     # Resend phone verification OTP
+POST   /auth/phone/verify                  # Verify phone OTP
 
-GET    /auth/profile                    # Get current user profile
-PATCH  /auth/profile                    # Update profile
-DELETE /auth/profile                    # Delete account
+GET    /auth/me                            # Get current user profile
+PATCH  /auth/profile                       # Update profile
 
-GET    /auth/sessions                   # List all sessions
-DELETE /auth/sessions/:id               # Logout specific device
-DELETE /auth/sessions                   # Logout all devices
-DELETE /auth/sessions/others            # Logout other devices
+GET    /auth/sessions                      # List all sessions
+DELETE /auth/sessions/:id                  # Logout specific device
+DELETE /auth/sessions                     # Logout all devices
+DELETE /auth/sessions/others               # Logout other devices
 ```
 
 ### Auth - Admin (Admin/Super Admin)
@@ -402,11 +416,11 @@ DELETE /auth/sessions/others            # Logout other devices
 POST   /admin/auth/login                # Admin login
 POST   /admin/auth/refresh-token        # Refresh token
 POST   /admin/auth/logout               # Logout
-POST   /admin/auth/change-password      # Change password
-POST   /admin/auth/forgot-password      # Forgot password
-POST   /admin/auth/reset-password       # Reset password
+POST   /admin/auth/password/change      # Change password
+POST   /admin/auth/password/forgot      # Forgot password
+POST   /admin/auth/password/reset       # Reset password
 
-GET    /admin/auth/profile              # Get admin profile
+GET    /admin/auth/me                   # Get admin profile
 PATCH  /admin/auth/profile              # Update profile
 
 GET    /admin/auth/sessions             # List sessions
@@ -439,13 +453,13 @@ GET    /docs                            # Swagger UI
 
 ### Multi-Environment Setup
 
-| File | Purpose | Git |
-|------|---------|-----|
-| `.env.example` | Template with all variables | Committed |
-| `.env.development` | Development configuration | Ignored |
-| `.env.staging` | Staging configuration | Ignored |
-| `.env.production` | Production configuration | Ignored |
-| `.env` | Local overrides | Ignored |
+| File               | Purpose                     | Git       |
+| ------------------ | --------------------------- | --------- |
+| `.env.example`     | Template with all variables | Committed |
+| `.env.development` | Development configuration   | Ignored   |
+| `.env.staging`     | Staging configuration       | Ignored   |
+| `.env.production`  | Production configuration    | Ignored   |
+| `.env`             | Local overrides             | Ignored   |
 
 ### Loading Priority
 
@@ -774,8 +788,8 @@ import { Roles } from '../../common/decorators/roles.decorator';
 import { Public } from '../../common/decorators/public.decorator';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { Role } from '../../common/enums/role.enum';
-import { LoginDto } from './dto/login.dto';
-import { RegisterDto } from './dto/register.dto';
+import { LoginDto } from './dto/requests/login.dto';
+import { RegisterDto } from './dto/requests/register.dto';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -826,7 +840,7 @@ export class AuthController {
 ### Example: DTO with Validation
 
 ```typescript
-// src/modules/auth/dto/register.dto.ts
+// src/modules/auth/dto/requests/register.dto.ts
 import {
   IsEmail,
   IsString,
@@ -1029,7 +1043,9 @@ export class TwilioService {
       this.configService.get<string>('twilio.accountSid'),
       this.configService.get<string>('twilio.authToken'),
     );
-    this.verifyServiceSid = this.configService.get<string>('twilio.verifyServiceSid');
+    this.verifyServiceSid = this.configService.get<string>(
+      'twilio.verifyServiceSid',
+    );
   }
 
   // Send SMS
@@ -1067,9 +1083,7 @@ export class TwilioService {
   async sendBulkSms(
     recipients: { to: string; message: string }[],
   ): Promise<void> {
-    await Promise.all(
-      recipients.map((r) => this.sendSms(r.to, r.message)),
-    );
+    await Promise.all(recipients.map((r) => this.sendSms(r.to, r.message)));
   }
 }
 ```
@@ -1321,7 +1335,10 @@ export interface ApiResponse<T> {
 }
 
 @Injectable()
-export class ResponseInterceptor<T> implements NestInterceptor<T, ApiResponse<T>> {
+export class ResponseInterceptor<T> implements NestInterceptor<
+  T,
+  ApiResponse<T>
+> {
   intercept(
     context: ExecutionContext,
     next: CallHandler,
@@ -1436,7 +1453,7 @@ import twilioConfig from './twilio.config';
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: [
-        '.env',                                    // Local overrides (highest priority)
+        '.env', // Local overrides (highest priority)
         `.env.${process.env.NODE_ENV || 'development'}`, // Environment-specific
       ],
       load: [
@@ -1994,6 +2011,7 @@ bugfix/*    → Bug fixes (PR to develop)
 ```
 
 **Workflow:**
+
 1. Create feature branch from `develop`
 2. Make changes and commit (conventional commits enforced)
 3. Push and create PR to `develop`
@@ -2003,11 +2021,11 @@ bugfix/*    → Bug fixes (PR to develop)
 
 ### CI/CD Pipeline
 
-| Trigger | Actions |
-|---------|---------|
+| Trigger                        | Actions                     |
+| ------------------------------ | --------------------------- |
 | Push/PR to `main` or `develop` | Lint → Format check → Build |
-| Push to `develop` | Deploy to staging server |
-| Push to `main` | Deploy to production server |
+| Push to `develop`              | Deploy to staging server    |
+| Push to `main`                 | Deploy to production server |
 
 ### Commit Message Format
 
@@ -2038,13 +2056,13 @@ Examples:
 
 ### Naming Conventions
 
-| Type | Convention | Example |
-|------|------------|---------|
-| Files | kebab-case | `user.entity.ts`, `jwt-auth.guard.ts` |
-| Classes | PascalCase | `UserEntity`, `JwtAuthGuard` |
-| Methods | camelCase | `findById`, `createUser` |
-| Constants | SCREAMING_SNAKE_CASE | `JWT_SECRET`, `QUEUE_NAME` |
-| Interfaces | PascalCase with I prefix (optional) | `JwtPayload`, `IApiResponse` |
+| Type       | Convention                          | Example                               |
+| ---------- | ----------------------------------- | ------------------------------------- |
+| Files      | kebab-case                          | `user.entity.ts`, `jwt-auth.guard.ts` |
+| Classes    | PascalCase                          | `UserEntity`, `JwtAuthGuard`          |
+| Methods    | camelCase                           | `findById`, `createUser`              |
+| Constants  | SCREAMING_SNAKE_CASE                | `JWT_SECRET`, `QUEUE_NAME`            |
+| Interfaces | PascalCase with I prefix (optional) | `JwtPayload`, `IApiResponse`          |
 
 ### Module Structure
 
