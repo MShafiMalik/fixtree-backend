@@ -9,6 +9,13 @@ import { UsersRepository } from '../../modules/users/users.repository';
 import { UtilService } from '../../common/util/util.service';
 import { Role } from '../../common/enums/role.enum';
 import { getSuperAdminSeedData } from './data/super-admin.seed';
+import { CountriesModule } from '../../modules/countries/countries.module';
+import { CountriesRepository } from '../../modules/countries/countries.repository';
+import { PlansModule } from '../../modules/plans/plans.module';
+import { PlansRepository } from '../../modules/plans/plans.repository';
+import { CountriesService } from '../../modules/countries/countries.service';
+import { getCountriesSeedData } from './data/countries.seed';
+import { getPlansSeedData } from './data/plans.seed';
 
 @Injectable()
 export class SeederService {
@@ -17,6 +24,9 @@ export class SeederService {
   constructor(
     private readonly usersRepository: UsersRepository,
     private readonly utilService: UtilService,
+    private readonly countriesRepository: CountriesRepository,
+    private readonly countriesService: CountriesService,
+    private readonly plansRepository: PlansRepository,
   ) {}
 
   async seed(): Promise<void> {
@@ -24,6 +34,8 @@ export class SeederService {
 
     try {
       await this.seedSuperAdmin();
+      await this.seedCountries();
+      await this.seedPlans();
       this.logger.log('Database seeding completed successfully');
     } catch (error) {
       this.logger.error('Database seeding failed', error);
@@ -63,10 +75,92 @@ export class SeederService {
 
     this.logger.log(`Super admin created (${seed.email})`);
   }
+
+  private async seedCountries(): Promise<void> {
+    const countries = getCountriesSeedData();
+
+    for (const countryData of countries) {
+      const existing = await this.countriesRepository.findByCode(
+        countryData.code,
+      );
+
+      if (existing) {
+        this.logger.log(
+          `Country already exists (${countryData.code}) - skipping`,
+        );
+        continue;
+      }
+
+      await this.countriesRepository.create({
+        name: countryData.name,
+        code: countryData.code,
+        currencyCode: countryData.currencyCode,
+        currencySymbol: countryData.currencySymbol,
+        isActive: true,
+      });
+
+      this.logger.log(
+        `Country created (${countryData.name} - ${countryData.code})`,
+      );
+    }
+  }
+
+  private async seedPlans(): Promise<void> {
+    const plans = getPlansSeedData();
+
+    for (const planData of plans) {
+      try {
+        // Get country by code
+        const country = await this.countriesService.findByCode(
+          planData.countryCode,
+        );
+
+        // Check if plan already exists
+        const existing = await this.plansRepository.findByNameAndCountryId(
+          planData.name,
+          country.id,
+        );
+
+        if (existing) {
+          this.logger.log(
+            `Plan already exists (${planData.name} for ${planData.countryCode}) - skipping`,
+          );
+          continue;
+        }
+
+        await this.plansRepository.create({
+          name: planData.name,
+          countryId: country.id,
+          description: planData.description,
+          serviceLimit: planData.serviceLimit,
+          price: planData.price,
+          canExtendBookingTime: planData.canExtendBookingTime,
+          isDefault: planData.isDefault,
+          isActive: true,
+        });
+
+        this.logger.log(
+          `Plan created (${planData.name} for ${planData.countryCode})`,
+        );
+      } catch (error) {
+        this.logger.error(
+          `Failed to create plan ${planData.name} for ${planData.countryCode}:`,
+          error,
+        );
+      }
+    }
+  }
 }
 
 @Module({
-  imports: [AppConfigModule, DatabaseModule, UtilModule, UsersModule],
+  imports: [
+    AppConfigModule,
+    DatabaseModule,
+    UtilModule,
+    UsersModule,
+    CountriesModule,
+    PlansModule,
+  ],
   providers: [SeederService],
 })
 class SeederAppModule {}
