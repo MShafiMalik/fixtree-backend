@@ -13,6 +13,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { AdminModule } from './modules/admin/admin.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
 import { HealthModule } from './modules/health/health.module';
+import { CategoriesModule } from './modules/categories/categories.module';
 import { RequestIdMiddleware } from './common/middleware/request-id.middleware';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { RolesGuard } from './common/guards/roles.guard';
@@ -35,6 +36,7 @@ import { WebSocketModule } from './shared/websocket/websocket.module';
     AdminModule,
     NotificationsModule,
     HealthModule,
+    CategoriesModule,
     CronModule,
   ],
   providers: [

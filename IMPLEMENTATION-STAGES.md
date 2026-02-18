@@ -28,7 +28,7 @@ Each stage is a separate commit. Complete one stage before moving to the next.
 | [16](#stage-16-websocket-setup)              | WebSocket Setup               | ✅ Completed  |
 | [17](#stage-17-admin-module)                 | Admin Module                  | ⬜ Pending    |
 | [18](#stage-18-extend-seller-module)         | Extend Seller Module          | ⬜ Pending    |
-| [19](#stage-19-categories-module)            | Categories Module             | ⬜ Pending    |
+| [19](#stage-19-categories-module)            | Categories Module             | ✅ Completed  |
 | [20](#stage-20-services-module)              | Services Module               | ⬜ Pending    |
 | [21](#stage-21-booking-core-features)        | Booking Core Features         | ⬜ Pending    |
 | [22](#stage-22-booking-admin-endpoints)      | Booking Admin Endpoints       | ⬜ Pending    |
