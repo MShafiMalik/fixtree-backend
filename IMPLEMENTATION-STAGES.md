@@ -25,7 +25,7 @@ Each stage is a separate commit. Complete one stage before moving to the next.
 | [13](#stage-13-swagger-documentation)        | Swagger Documentation         | ✅ Completed  |
 | [14](#stage-14-health-check-module)          | Health Check Module           | ✅ Completed  |
 | [15](#stage-15-database-seeders)             | Database Seeders              | ✅ Completed  |
-| [16](#stage-16-websocket-setup)              | WebSocket Setup               | ⬜ Pending    |
+| [16](#stage-16-websocket-setup)              | WebSocket Setup               | ✅ Completed  |
 | [17](#stage-17-admin-module)                 | Admin Module                  | ⬜ Pending    |
 | [18](#stage-18-extend-seller-module)         | Extend Seller Module          | ⬜ Pending    |
 | [19](#stage-19-categories-module)            | Categories Module             | ✅ Completed  |
@@ -1213,7 +1213,7 @@ Set up WebSocket infrastructure using Socket.IO for real-time communication. Thi
 
 **Module Organization:**
 
-- **WebSocket Gateway** (`src/common/websocket/`): Core WebSocket infrastructure, authentication, and connection management
+- **WebSocket Gateway** (`src/shared/websocket/`): Core WebSocket infrastructure, authentication, and connection management
 - **Shared Infrastructure**: Reusable WebSocket setup for all modules that need real-time communication
 
 **Flow:**
@@ -1236,7 +1236,7 @@ Set up WebSocket infrastructure using Socket.IO for real-time communication. Thi
 - [ ] Install: `socket.io`, `@nestjs/websockets`, `@nestjs/platform-socket.io`
 - [ ] Install: `@types/socket.io` (dev dependency)
 
-### WebSocket Infrastructure (`src/common/websocket/`)
+### WebSocket Infrastructure (`src/shared/websocket/`)
 
 - [ ] Create `WebSocketGateway` base class implementing `OnGatewayConnection`, `OnGatewayDisconnect`
 - [ ] Configure Socket.IO server with CORS settings
@@ -1265,7 +1265,7 @@ Set up WebSocket infrastructure using Socket.IO for real-time communication. Thi
 **Files to create:**
 
 ```
-src/common/websocket/
+src/shared/websocket/
 ├── websocket.module.ts
 ├── websocket.gateway.ts
 ├── guards/
@@ -1320,7 +1320,7 @@ export class WebSocketGateway
 **Implementation Checklist:**
 
 - [ ] Install WebSocket dependencies: `socket.io`, `@nestjs/websockets`, `@nestjs/platform-socket.io`, `@types/socket.io`
-- [ ] Create `WebSocketModule` in `src/common/websocket/`
+- [ ] Create `WebSocketModule` in `src/shared/websocket/`
 - [ ] Create `WebSocketGateway` base class:
   - [ ] Configure CORS settings
   - [ ] Configure namespace

@@ -1,49 +1,24 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
-  IsEmail,
   IsString,
   IsOptional,
   IsBoolean,
   IsIn,
   MinLength,
   MaxLength,
-  Matches,
   ValidateNested,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { Role } from '../../../../common/enums/role.enum';
 import { DeviceInfoDto } from './device-info.dto';
-import { AtLeastOne } from '../../../../common/validators/at-least-one.validator';
+import { AuthCredentialsBaseDto } from './auth-credentials-base.dto';
 
-export class RegisterDto {
-  @ApiPropertyOptional({ format: 'email', example: 'user@example.com' })
-  @IsEmail()
-  @IsOptional()
-  email?: string;
-
-  @ApiProperty({ minLength: 8, maxLength: 100, example: 'Pass@1234' })
-  @AtLeastOne(['email', 'phone'], {
-    message: 'Either email or phone is required',
-  })
-  @IsString()
-  @MinLength(8)
-  @MaxLength(100)
-  @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/, {
-    message:
-      'Password must contain at least one uppercase, one lowercase, one number, and one special character',
-  })
-  password: string;
-
+export class RegisterDto extends AuthCredentialsBaseDto {
   @ApiProperty({ minLength: 2, maxLength: 100, example: 'John Doe' })
   @IsString()
   @MinLength(2)
   @MaxLength(100)
   name: string;
-
-  @ApiPropertyOptional({ example: '+1234567890' })
-  @IsString()
-  @IsOptional()
-  phone?: string;
 
   @ApiPropertyOptional({ enum: [Role.BUYER, Role.SELLER] })
   @IsIn([Role.BUYER, Role.SELLER], {

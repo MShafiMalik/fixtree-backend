@@ -1,42 +1,19 @@
 import {
-  IsEmail,
   IsString,
   IsOptional,
   IsEnum,
   IsBoolean,
   MinLength,
   MaxLength,
-  Matches,
 } from 'class-validator';
 import { Role } from '../../../common/enums/role.enum';
-import { AtLeastOne } from '../../../common/validators/at-least-one.validator';
+import { AuthCredentialsBaseDto } from 'src/modules/auth/dto/requests';
 
-export class CreateUserDto {
-  @AtLeastOne(['email', 'phone'], {
-    message: 'Either email or phone is required',
-  })
-  @IsEmail()
-  @IsOptional()
-  email?: string;
-
-  @IsString()
-  @MinLength(8)
-  @MaxLength(100)
-  @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/, {
-    message:
-      'Password must contain at least one uppercase, one lowercase, one number, and one special character',
-  })
-  @IsOptional()
-  password?: string;
-
+export class CreateUserDto extends AuthCredentialsBaseDto {
   @IsString()
   @MinLength(2)
   @MaxLength(100)
   name: string;
-
-  @IsString()
-  @IsOptional()
-  phone?: string;
 
   @IsEnum(Role)
   @IsOptional()

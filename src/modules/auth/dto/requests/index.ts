@@ -11,3 +11,4 @@ export * from './verify-phone.dto';
 export * from './resend-email-verification.dto';
 export * from './resend-phone-verification.dto';
 export * from './refresh-token.dto';
+export * from './auth-credentials-base.dto';
