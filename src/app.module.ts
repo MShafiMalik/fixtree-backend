@@ -13,6 +13,8 @@ import { AuthModule } from './modules/auth/auth.module';
 import { AdminModule } from './modules/admin/admin.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
 import { HealthModule } from './modules/health/health.module';
+import { PlansModule } from './modules/plans/plans.module';
+import { CountriesModule } from './modules/countries/countries.module';
 import { CategoriesModule } from './modules/categories/categories.module';
 import { RequestIdMiddleware } from './common/middleware/request-id.middleware';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
@@ -36,6 +38,8 @@ import { WebSocketModule } from './shared/websocket/websocket.module';
     AdminModule,
     NotificationsModule,
     HealthModule,
+    CountriesModule,
+    PlansModule,
     CategoriesModule,
     CronModule,
   ],
